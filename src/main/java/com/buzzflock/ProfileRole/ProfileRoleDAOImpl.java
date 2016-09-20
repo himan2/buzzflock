@@ -57,7 +57,7 @@ public class ProfileRoleDAOImpl  implements ProfileRoleDAO
 			
 			if( ur == null )
 			{
-				ur = new ProfileRole("Profile" , 1);
+				ur = new ProfileRole("USER" , 1);
 				
 				this.insertUserRole(ur);
 			}

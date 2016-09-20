@@ -46,8 +46,8 @@ font-family: "Algerian"
  <div class="col-sm-4" ><h1>Buzz Flock</h1></div>
 <div class="col-sm-2" ></div>
     <div class="col-sm-4" >
-<button type="button" class="btn btn-default btn-lg">SignUp</button>
-<button type="button" class="btn btn-default btn-lg">Login</button>
+<a href="${pageContext.request.contextPath}/signup"><button type="button" class="btn btn-default btn-lg">SignUp</button></a>
+<a href="${pageContext.request.contextPath}/loginpage"><button type="button" class="btn btn-default btn-lg">Login</button></a>
 </div>
     
   </div>
