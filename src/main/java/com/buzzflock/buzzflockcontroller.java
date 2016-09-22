@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -47,10 +49,38 @@ public class buzzflockcontroller {
 		return "index";
 	}
 	
-	@RequestMapping(value="/profile")	
-	public String profile()
-	{	
-		return "profile";
+	@RequestMapping("/profile")
+	public ModelAndView prfl() {
+
+		String username = "";
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if (auth != null && !auth.getName().equals("anonymousUser"))
+	    {    
+	    	username = auth.getName();
+	    	
+	    }
+	    
+		ModelAndView mav = new ModelAndView("profile");
+
+		JSONObject jobj = new JSONObject();
+		
+		List<Profile> list = us.getAllUsers();
+		
+		for (Profile p : list) {
+			
+			if( p.getUsername().equals(username) )
+			{
+								
+				jobj.put("ProfileImage", p.getImage());
+				
+			}
+		}
+
+		mav.addObject("data", jobj.toJSONString());
+
+		return mav;
+
 	}
 	
 	@RequestMapping(value="/signup")
