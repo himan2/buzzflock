@@ -45,6 +45,17 @@ public class Profile implements Serializable
 	public void setGender(String gender) {
 		Gender = gender;
 	}
+	
+	private String Image;
+	
+	public String getImage() {
+		return Image;
+	}
+
+	public void setImage(String image) {
+		Image = image;
+	}
+
 	private String Password;
 	
 	@Transient

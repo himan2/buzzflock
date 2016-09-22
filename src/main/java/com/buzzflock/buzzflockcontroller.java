@@ -62,6 +62,8 @@ public class buzzflockcontroller {
      	return mav;
 	}
 	
+	
+	
 	@RequestMapping(value="/insertuser", method = RequestMethod.POST)
 	public ModelAndView insertuser( @Valid @ModelAttribute ("newuser") Profile i , BindingResult bind, HttpServletRequest req , HttpServletResponse resp )
 	{
@@ -74,7 +76,22 @@ public class buzzflockcontroller {
 			mav.addObject("newuser", i);
 		}
 		else
+			
 		{
+			Profile validateuser = us.getUser(i.getUsername());
+			
+			if( validateuser == null )
+			{
+				if( i.getGender().equals("M") )
+				{
+					i.setImage("resources/images/male.jpg");
+				}
+				else
+				{
+					i.setImage("resources/images/female.jpg");
+				}
+				
+			}
 			if( i.getPassword().equals(i.getCPassword()) )
 			{
 				List<Profile> list = us.getAllUsers();
@@ -83,8 +100,7 @@ public class buzzflockcontroller {
 				
 				for( Profile u : list )
 				{
-					System.out.println(u.getUsername());
-					System.out.println(i.getUsername());
+					
 					
 					if( u.getUsername().equals(i.getUsername()) )
 					{
@@ -114,7 +130,7 @@ public class buzzflockcontroller {
 				
 				mav.addObject("passwordmismatch", "passwordmismatch");
 			}
-				
+			
 		}
 		
 		
@@ -142,6 +158,7 @@ public class buzzflockcontroller {
 		return mav ;
 	}
 	
+		
 	@RequestMapping(value="/loginpage" , method = RequestMethod.GET)
 	public ModelAndView login() {
 		
