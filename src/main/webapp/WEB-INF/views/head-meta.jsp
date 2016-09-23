@@ -8,6 +8,8 @@
 <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
+  <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/img.png" />
+  
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/references/css/bootstrap.min.css">
   <script type="text/javascript" src="${pageContext.request.contextPath}/resources/references/js/jquery.min.js"></script>
   <script type="text/javascript" src="${pageContext.request.contextPath}/resources/references/js/bootstrap.min.js"></script>

@@ -35,7 +35,7 @@ public class Profile implements Serializable
 	private String Email;
 	
 	private String Username;
-	
+		
 	private String Gender;
 	
 	public String getGender() {
