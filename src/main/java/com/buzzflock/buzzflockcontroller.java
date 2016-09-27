@@ -73,6 +73,11 @@ public class buzzflockcontroller {
 			{
 								
 				jobj.put("ProfileImage", p.getImage());
+				jobj.put("Username", p.getUsername());
+				jobj.put("Email", p.getEmail());
+				jobj.put("Gender", p.getGender());
+				jobj.put("Phone", p.getPhone());
+				
 				
 			}
 		}
@@ -91,8 +96,8 @@ public class buzzflockcontroller {
      mav.addObject("newuser",new Profile());	 
      	return mav;
 	}
-	
-	
+
+
 	
 	@RequestMapping(value="/insertuser", method = RequestMethod.POST)
 	public ModelAndView insertuser( @Valid @ModelAttribute ("newuser") Profile i , BindingResult bind, HttpServletRequest req , HttpServletResponse resp )

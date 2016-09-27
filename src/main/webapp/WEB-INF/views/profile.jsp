@@ -14,11 +14,49 @@
 
 	var myApp = angular.module('myApp', []);
 
-	myApp.controller("abc", function($scope)
+	myApp.factory('UserService', ['$http', '$q', function($http, $q){
+		 
+	    return {
+	    			getUserDetails: function(){
+	                    return $http.post('http://localhost:9001/buzzflock/getUserDetails/')
+	                            .then(
+	                                    function(response){
+	                                        return response.data;
+	                                    }, 
+	                                    function(errResponse){
+	                                        console.error('Error while updating User');
+	                                        return $q.reject(errResponse);
+	                                    }
+	                            );
+	            		
+	    		}
+		};
+	 
+	}]);
+	
+	myApp.controller("abc", [ "$scope" , "UserService" , function($scope,$UserService)
 	{
 		$scope.data = ${data};
 		
 		$scope.myerror = "";
+		
+		$scope.userdata;
+		
+		$scope.edit = false;
+		
+		$UserService.getUserDetails().then(
+		
+				function(response)
+				{
+					$scope.userdata = response;
+					console.log( $scope.userdata );
+				}
+				,
+				function(errResponse)
+				{
+					console.log('Error in getting User Data');
+				}
+		);
 		
 		$scope.CheckValidFileType = function( inp )
 		{
@@ -43,7 +81,7 @@
 			//alert( filename.substring( filename.indexOf('.') , filename.length ) );
 			$scope.CheckValidFileType( filename.substring( filename.indexOf('.') , filename.length ) );
 		});
-	});
+	}]);
 </script>
 
 
@@ -86,6 +124,50 @@ profile page
  height=" 150px" width="200px">
 </td>
 </tr>
+
+<tr>
+						<td>User Name:</td>
+						<td>
+							<label ng-if="!edit">{{userdata.ProfileName}}</label>
+							<input type="text" class="form-control" value="{{userdata.ProfileName}}" ng-model="userdata.ProfileName" ng-if="edit"/>							
+						</td>
+					</tr>
+					
+					<tr>
+						<td>Email:</td>
+						<td>
+							<label ng-show="!change">{{data.Email}}</label>
+								</td>
+					</tr>
+					
+					<tr>
+						<td>Gender:</td>
+						<td>
+							<label ng-show="!change">{{data.Gender}}</label>
+							
+						</td>
+					</tr>
+					
+					<tr>
+						<td>Phone:</td>
+						<td>
+							<label ng-show="!change">{{data.Phone}}</label>
+								</td>
+					</tr>
+					
+					
+					
+					<tr>
+						<td>
+						<button class="btn btn-link" ng-click="edit = !edit">
+							<span ng-if="!edit">Edit</span>
+							<span ng-if="edit">Let It Be</span>
+						</button>
+						</td>
+						<td>
+							<button class="btn btn-success" ng-if="edit">Update</button>
+						</td>
+					</tr>
 
 </tbody>
 </table>

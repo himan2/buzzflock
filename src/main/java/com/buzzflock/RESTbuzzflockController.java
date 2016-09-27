@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.buzzflock.ProfileModel.Profile;
 import com.buzzflock.ProfileModel.ProfileService;
 
 
@@ -44,7 +45,7 @@ import com.buzzflock.ProfileModel.ProfileService;
 public class RESTbuzzflockController {
 
 	@Autowired
-	ProfileService us;
+	ProfileService ps;
 	
 	@Autowired
 	ServletContext context;
@@ -104,17 +105,35 @@ public class RESTbuzzflockController {
         return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
     }
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	@CrossOrigin
+    @RequestMapping(value = "/getUserDetails/", method = RequestMethod.POST )
+    public ResponseEntity<String> getUserDetails(HttpServletRequest request , HttpServletResponse response , UriComponentsBuilder ucBuilder) {
+        
+		String user = null;
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if (auth != null && !auth.getName().equals("anonymousUser"))
+	    {   
+	    	System.out.println(auth.getName());
+	    	user = auth.getName();
+	    }
+	    
+	    JSONObject json = new JSONObject();
+	    
+	    System.out.println(user);
+	    
+	    if( user != null )
+	    {
+	    	Profile p = ps.getUser(user);
+	    	
+	    	json.put("ProfileName", p.getUsername());
+	    	
+	    }
+		
+		System.out.println(json.toString());
+        
+        return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
+    }
 	
 	
 }
