@@ -109,6 +109,9 @@ legend{
                     <form:input path="email" type="text" name="email" value="" class="form-control input-lg" placeholder="Your Email"  />
                     <form:errors path="email" class="text text-danger"/>
                     
+                    <form:input path="location" type="text" name="loaction" value="" class="form-control input-lg" placeholder="Your Location"  />
+                    <form:errors path="location" class="text text-danger"/>
+                    
                     <label>Gender : </label>  
                     <form:radiobutton path="gender" value="M"/>Male
                     <form:radiobutton path="gender" value="F"/>Female

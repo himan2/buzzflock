@@ -38,6 +38,16 @@ public class Profile implements Serializable
 		
 	private String Gender;
 	
+	private String Location;
+	
+	public String getLocation() {
+		return Location;
+	}
+
+	public void setLocation(String location) {
+		Location = location;
+	}
+
 	public String getGender() {
 		return Gender;
 	}

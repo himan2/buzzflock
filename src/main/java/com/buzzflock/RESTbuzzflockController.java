@@ -52,60 +52,6 @@ public class RESTbuzzflockController {
 
 
 	@CrossOrigin
-    @RequestMapping(value = "/updateProfilePicture/", method = RequestMethod.POST )
-    public ResponseEntity<String> updateProfilePicture(MultipartHttpServletRequest request , HttpServletResponse response , UriComponentsBuilder ucBuilder) {
-        
-		System.out.println( request.getHeader("user") );
-		
-		System.out.println( request.getFile("file").getName() );
-		System.out.println( request.getFile("file").getSize() );
-		System.out.println( request.getFile("file").getContentType() );
-		System.out.println( request.getFile("file").getOriginalFilename() );
-		
-		String hashname[] = request.getFile("file").getOriginalFilename().split(",");
-		
-		JSONObject json = new JSONObject();
-		
-		json.put("status", "Failed");
-		
-		BufferedOutputStream stream = null;
-		
-		try
-	    {
-			String path = context.getRealPath("/");
-	        
-	        System.out.println(path);
-	        
-	        File directory = null;
-	        
-	        System.out.println( request.getFile("file") );
-	        
-	        if (request.getFile("file").getContentType().contains("image"))
-	        {
-	            directory = new File(path + "\\resources\\images");
-	            
-	            System.out.println(directory);
-	            
-	            byte[] bytes = null;
-	            File file = null;
-	            bytes = request.getFile("file").getBytes();
-	            
-	            if (!directory.exists()) directory.mkdirs();
-	           
-	           
-	        }
-	    }
-	    catch (Exception e)
-	    {
-	    	e.printStackTrace();
-	    }
-		
-		System.out.println(json.toString());
-        
-        return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
-    }
-	
-	@CrossOrigin
     @RequestMapping(value = "/getUserDetails/", method = RequestMethod.POST )
     public ResponseEntity<String> getUserDetails(HttpServletRequest request , HttpServletResponse response , UriComponentsBuilder ucBuilder) {
         
@@ -127,6 +73,10 @@ public class RESTbuzzflockController {
 	    	Profile p = ps.getUser(user);
 	    	
 	    	json.put("ProfileName", p.getUsername());
+			json.put("ProfileEmail", p.getEmail());
+			json.put("ProfileGender", p.getGender());
+			json.put("ProfilePhone", p.getPhone());
+			json.put("ProfileLocation", p.getLocation());
 	    	
 	    }
 		
@@ -134,6 +84,63 @@ public class RESTbuzzflockController {
         
         return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
     }
+		
 	
+	@CrossOrigin
+    @RequestMapping(value = "/updateUserDetails/", method = RequestMethod.POST)
 	
+    public ResponseEntity<String> updateUserDetails(HttpServletResponse response,@RequestBody String data, UriComponentsBuilder ucBuilder) {
+        
+		System.out.println(data);
+		
+		JSONObject jobjin = new JSONObject();
+		
+		JSONParser jpar = new JSONParser();
+		
+		try
+		{
+			jobjin = (JSONObject)jpar.parse(data);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		System.out.println( jobjin.toJSONString() );
+		
+		String user = null;
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if (auth != null && !auth.getName().equals("anonymousUser"))
+	    {   
+	    	System.out.println(auth.getName());
+	    	user = auth.getName();
+	    }
+	    
+	    System.out.println(user);
+	    
+	    if( user != null )
+	    {
+	    	Profile p = ps.getUser(user);
+	    	
+	    	p.setUsername( jobjin.get("ProfileName").toString() );
+	    	p.setEmail( jobjin.get("ProfileEmail").toString() );
+	    	p.setGender( jobjin.get("ProfileGender").toString() );
+	    	p.setPhone( jobjin.get("ProfilePhone").toString() );
+	    	p.setPhone( jobjin.get("ProfileLocation").toString() );
+	    	p.setCPassword(p.getPassword());
+	    	
+	    	ps.updateUser(p);
+	    	
+	    }
+		
+		JSONObject json = new JSONObject();
+        	        
+        json.put("status", "Updated");
+        
+        System.out.println(json.toString());
+        
+        return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
+    }
+
 }
