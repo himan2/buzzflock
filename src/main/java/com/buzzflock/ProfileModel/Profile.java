@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -135,19 +136,22 @@ public class Profile implements Serializable
 	public void setPassword(String password) {
 		Password = password;
 	}
+	
+	
 	@Length(max=10,min=10,message="Phone number is not valid. Should be of length 10.")
-    @NumberFormat(style= Style.NUMBER)
-	@NotEmpty(message="Phone Number field is mandatory.")
+    @NotEmpty(message="Phone field is mandatory.") @NumberFormat(style= Style.NUMBER)
 	public String getPhone() {
 		return Phone;
 	}
+
 	public void setPhone(String phone) {
 		Phone = phone;
 	}
-	
+
 	public Profile(){
 		
 	}
+	
 	@Override
 	public String toString() {
 		return "User [ID=" + ID + ", Email=" + Email + ", Username=" + Username + ", Password=" + Password

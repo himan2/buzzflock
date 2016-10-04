@@ -123,11 +123,16 @@ public class RESTbuzzflockController {
 	    {
 	    	Profile p = ps.getUser(user);
 	    	
+	    	System.out.println(p);
+	    	
 	    	p.setUsername( jobjin.get("ProfileName").toString() );
 	    	p.setEmail( jobjin.get("ProfileEmail").toString() );
 	    	p.setGender( jobjin.get("ProfileGender").toString() );
+	    	
+	    	System.out.println(jobjin.get("ProfilePhone").toString());
+	    	
 	    	p.setPhone( jobjin.get("ProfilePhone").toString() );
-	    	p.setPhone( jobjin.get("ProfileLocation").toString() );
+	    	p.setLocation( jobjin.get("ProfileLocation").toString() );
 	    	p.setCPassword(p.getPassword());
 	    	
 	    	ps.updateUser(p);
@@ -143,4 +148,68 @@ public class RESTbuzzflockController {
         return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
     }
 
-}
+	@CrossOrigin
+    @RequestMapping(value = "/updatePassword/", method = RequestMethod.POST)
+	
+    public ResponseEntity<String> updatePassword(HttpServletResponse response,@RequestBody String data, UriComponentsBuilder ucBuilder) {
+        
+		System.out.println(data);
+		
+		
+		JSONObject json = new JSONObject();
+        
+		JSONParser jpar = new JSONParser();
+		
+		try
+		{
+			json = (JSONObject)jpar.parse(data);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		String user = null;
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if (auth != null && !auth.getName().equals("anonymousUser"))
+	    {   
+	    	System.out.println(auth.getName());
+	    	user = auth.getName();
+	    }
+	    
+	    if( user != null )
+	    	
+	   {
+	    	Profile p = ps.getUser(user);
+	    	
+	    	String pass = json.get("OldPassword").toString();
+	    	
+	    	if(p.getPassword().equals(pass) )
+	    	{
+	    		String npass =  json.get("NewPassword").toString(); 
+	    		p.setPassword(npass);
+	    		p.setUsername(p.getUsername());
+		    	p.setGender( p.getGender());
+		    	p.setPhone( p.getPhone() );
+		    	p.setLocation( p.getLocation());
+		    	p.setCPassword(p.getPassword());
+		    	
+	    		ps.updateUser(p);
+	    		
+	    		json.put("status", "Updated");
+	    	}
+	   
+	     
+	   }
+	    else
+	    {
+	    	json.put("status", "Password Incorrect");
+	    }
+	    
+        System.out.println(json.toString());
+        
+        return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
+    }
+	}
+	

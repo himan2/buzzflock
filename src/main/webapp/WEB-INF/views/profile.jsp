@@ -48,9 +48,26 @@
                     );
 		
 	    }
-	    };
-	 
-	}]);
+	    ,
+ 	    updatePassword: function(item)
+	    {
+            return $http.post('http://localhost:9001/buzzflock/updatePassword/', item)
+                    .then
+                    (
+                            function(response)
+                            {
+                                return response.data;
+                            }, 
+                            function(errResponse)
+                            {
+                                console.error('Error while updating User');
+                                return $q.reject(errResponse);
+                            }
+                    );
+		
+	    }
+	    };}]);
+	
 	
 	
 	myApp.controller("abc",['$scope', 'UserService',function($scope , $UserService ) {
@@ -61,6 +78,16 @@
 		$scope.userdatatemp;
 		
 		$scope.edit = false;
+		$scope.password=false;
+		
+		$scope.UserPasswordDetails = 	
+		{ 
+				
+				OldPassword: "",
+				NewPassword: "",
+				ConfirmNewPassword: ""
+		};
+		
 		
 		$scope.genderCheck = false;
 		$scope.CheckForGender = function()
@@ -76,7 +103,60 @@
 		$scope.updateOverall = function()
 		{
 			$scope.overallValidationCheck = $scope.genderCheck;
+			$scope.overallValidationCheck = $scope.emailCheck;	
+			$scope.overallValidationCheck = $scope.phoneCheck;
+			$scope.overallValidationCheck = $scope.oldpasswordCheck;
 		}
+		
+		$scope.CheckForEmail = function()
+		{
+			var reg = /\S+@\S+\.\S+/;
+			
+			if ($scope.emailCheck=!reg.test( $scope.userdatatemp.ProfileEmail ))
+			$scope.emailCheck = true;
+			else
+			$scope.emailCheck = false;
+			$scope.updateOverall();
+		}
+		
+		$scope.CheckForPhone = function()
+		{
+			var reg = /^[7-9][0-9]{9}$/;
+		
+			if ($scope.phoneCheck = !reg.test( $scope.userdatatemp.ProfilePhone ))
+				$scope.phoneCheck=true;
+			else
+				$scope.phoneCheck=false;
+				$scope.updateOverall();
+		}
+		
+		$scope.CheckForOldPassword = function()
+		{
+			var reg = /^.{6,15}$/;
+		
+			if ($scope.oldpasswordCheck = !reg.test( $scope.UserPasswordDetails.OldPassword))
+				
+				$scope.oldpasswordCheck=true;
+			else
+				$scope.oldpasswordCheck=false;
+			
+				$scope.updateOverallPassword();
+		}
+	 
+	 $scope.CheckPassword = function()
+	 {
+		if ($scope.UserPasswordDetails.NewPassword != $scope.UserPasswordDetails.ConfirmNewPassword) 
+	 	
+			$scope.matchpasswordCheck=true;
+		else
+			$scope.matchpasswordCheck=false;
+	 }
+	 
+	 $scope.updateOverallPassword = function()
+	 {
+		 $scope.overallValidationPasswordCheck = $scope.oldpasswordCheck;
+		 $scope.overallValidationPasswordCheck = $scope.matchpasswordCheck;
+	 }
 		
 		$UserService.getUserDetails().then(
 				
@@ -93,7 +173,30 @@
 					console.log('Error in getting User Data');
 				}
 		);
-
+		
+		$scope.toggleUpdatePassword = function(response)
+		{
+			console.log(JSON.stringify($scope.UserPasswordDetails));
+			
+			$UserService.updatePassword(JSON.stringify($scope.UserPasswordDetails)).then
+			(
+			function(response)
+			{
+				if(response.status =="Updated")
+					{
+					System.out.println("Success");
+					}
+					
+			  }
+		 ,
+		 function(errResponse)
+		 {
+				console.log('Error in updating User Data');
+			}
+			
+			)}
+		,
+		
 		$scope.toggleChangeUpdate = function(response)
 		{  
 			console.log( JSON.stringify($scope.userdatatemp) );
@@ -115,7 +218,6 @@
 					}
 			);
 		}
-		
 		
 		
 		$scope.letitbe = function()
@@ -154,22 +256,9 @@
 
 
 <body ng-app="myApp" ng-controller="abc">
-	<c:choose>
-		<c:when test="${not empty pageContext.request.userPrincipal}">
-			<li><a href="${pageContext.request.contextPath}/index">${pageContext.request.userPrincipal.name}</a></li>
-			<li><a href="${pageContext.request.contextPath}/logout">Log
-					Out</a></li>
+<c:import url="head.jsp"/>
 
-		</c:when>
-
-		<c:otherwise>
-			<li><a href="${pageContext.request.contextPath}/signup"><span
-					class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-			<li><a href="${pageContext.request.contextPath}/loginpage"><span
-					class="glyphicon glyphicon-log-in"></span> Login</a></li>
-		</c:otherwise>
-	</c:choose>
-
+	
 
 
 <div class="container">
@@ -206,14 +295,16 @@
 				<tr>
 					<td>Email:</td>
 					<td><label ng-if="!edit">{{userdata.ProfileEmail}}</label>
-					<input type="text" class="form-control" value="{{userdatatemp.ProfileEmail}}" ng-model="userdatatemp.ProfileEmail" ng-if="edit"/>							
+					<input type="text" class="form-control" value="{{userdatatemp.ProfileEmail}}" ng-model="userdatatemp.ProfileEmail" ng-if="edit" ng-change="CheckForEmail();"/>							
+					<label ng-if="emailCheck" class="text text-danger">Email Id not correct</label>
 					</td>
 				</tr>
 				<tr>
 				
 					<td>Contact No:</td>
 					<td><label ng-if="!edit">{{userdata.ProfilePhone}}</label>
-					<input type="text" class="form-control" value="{{userdatatemp.ProfilePhone}}" ng-model="userdatatemp.ProfilePhone" ng-if="edit"/>
+					<input type="text" class="form-control" value="{{userdatatemp.ProfilePhone}}" ng-model="userdatatemp.ProfilePhone" ng-if="edit" ng-change="CheckForPhone();"/>
+					<label ng-if="phoneCheck">Incorrect Phone Number</label>
 					</td>
 					</tr>
 					
@@ -243,7 +334,49 @@
 			</tr>
 		</tbody>
 	 </table>
-	</div>
-	
+	 
+<table class=table>
+<tbody ng-if="password">
+
+					<tr>
+					<td>Old Password</td>
+					<td>
+					<input type="text" class="form-control"  ng-if="password" value="{{UserPasswordDetails.OldPassword}}" ng-model="UserPasswordDetails.OldPassword" ng-change="CheckForOldPassword();"/>
+					<label ng-if="oldpasswordCheck">Password Should be betweeen 6 to 15 Character</label>							
+					</td>
+					</tr>
+					
+					<tr>
+					<td>New Password</td>
+					<td><input type="text" class="form-control"  ng-if="password" value="{{UserPasswordDetails.NewPassword}}" ng-model="UserPasswordDetails.NewPassword"/>
+					</td>
+					</tr>
+					
+					<tr>
+					<td>Confirm New Password</td>
+					<td><input type="text" class="form-control" ng-if="password" value="{{UserPasswordDetails.ConfirmNewPassword}}" ng-model="UserPasswordDetails.ConfirmNewPassword" ng-change="CheckPassword();"/>							
+					
+					<label ng-if="matchpasswordCheck">New Password and Confirm Password Mismatch</label>
+					
+					</td>
+					</tr>
+					
+					
+
+
+<tr>
+						
+</tbody>
+</table>
 </body>
-</html>
+					<button class="btn btn-danger pull-right" ng-click="password=!password;">
+							<span ng-if="!password">Change Password</span>
+							<span ng-if="password">Let It Be</span>
+					</button>
+							<button class="btn btn-success" ng-if="password" ng-disabled="overallValidationPasswordCheck" >
+							
+								<span ng-click="toggleUpdatePassword();">Save</span>
+							</button>
+		 </div>
+ 
+ </html>
