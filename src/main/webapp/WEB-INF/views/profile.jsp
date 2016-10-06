@@ -13,6 +13,46 @@
 <script >
 	var myApp = angular.module('myApp', []);
 	
+	myApp.service('fileUpload', ['$http', function ($http) 
+	                   	      {
+	                   	    		this.uploadFileToUrl = function(file ,paramuser, uploadUrl)
+	                   	    		{
+	                   	        	var fd = new FormData();
+	                   	        	fd.append('file', file);
+	                   	    
+	                   	   	     	return $http.post(uploadUrl, fd, 
+	                   	   	     {
+	                   	            		transformRequest: angular.identity,
+	                   	            headers: {'Content-Type': undefined , user: paramuser}
+	                   	        }).then(
+	                                       function(response){
+	                                           return response.data;
+	                                       }, 
+	                                       function(errResponse){
+	                                           console.error('Error while updating User');
+	                                           return "error";
+	                                       }
+	                               );
+	                   	    }
+	                   	}]);
+	                   	
+	                   	/* myApp.directive('fileModel', ['$parse', function ($parse) {
+	                   	    return {
+	                   	        restrict: 'A',
+	                   	        link: function(scope, element, attrs) {
+	                   	            var model = $parse(attrs.fileModel);
+	                   	            var modelSetter = model.assign;
+	                   	            
+	                   	            element.bind('change', function(){
+	                   	                scope.$apply(function(){
+	                   	                    modelSetter(scope, element[0].files[0]);
+	                   	                });
+	                   	            });
+	                   	        }
+	                   	    };
+	                   	}]);
+	                   	 */
+	
 	
 	myApp.factory('UserService', ['$http', '$q', function($http, $q){
 	    return {
@@ -70,13 +110,14 @@
 	
 	
 	
-	myApp.controller("abc",['$scope', 'UserService',function($scope , $UserService ) {
+	myApp.controller("abc",['$scope', 'UserService', 'fileUpload' , function($scope , $UserService , $fileUpload ) {
 		$scope.data = ${data};
 		$scope.myerror = "";
 		
 		$scope.userdata;
 		$scope.userdatatemp;
 		
+		$scope.updated;
 		$scope.edit = false;
 		$scope.password=false;
 		
@@ -142,6 +183,19 @@
 			
 				$scope.updateOverallPassword();
 		}
+		
+		$scope.CheckForNewPassword = function()
+		{
+			var reg = /^.{6,15}$/;
+		
+			if ($scope.newpasswordCheck = !reg.test( $scope.UserPasswordDetails.NewPassword))
+				
+				$scope.newpasswordCheck=true;
+			else
+				$scope.newpasswordCheck=false;
+			
+				$scope.updateOverallPassword();
+		}
 	 
 	 $scope.CheckPassword = function()
 	 {
@@ -154,8 +208,8 @@
 	 
 	 $scope.updateOverallPassword = function()
 	 {
-		 $scope.overallValidationPasswordCheck = $scope.oldpasswordCheck;
-		 $scope.overallValidationPasswordCheck = $scope.matchpasswordCheck;
+		 $scope.overallValidationPasswordCheck = $scope.oldpasswordCheck || $scope.matchpasswordCheck || $scope.newpasswordCheck;
+		 
 	 }
 		
 		$UserService.getUserDetails().then(
@@ -174,6 +228,56 @@
 				}
 		);
 		
+		$scope.setFile = function(e)
+		{
+			
+			$scope.fileforupload = e.files[0];
+			
+			console.log($scope.fileforupload);
+			
+			/* var file = $scope.fileforupload;
+			
+			console.log($scope.fileforupload);
+			
+				var uploadUrl = "http://localhost:9001/buzzflock/updateProfilePicture/";
+		  	        
+	   		    var res = $fileUpload.uploadFileToUrl(file ,uploadUrl).then
+		  	        
+	   		    (
+		            		function(response)
+		            		{
+		            			$scope.response = response.status;
+		            			$scope.imagesrc = response.imagesrc;
+		            			
+		            			//console.log( $scope.response );
+		            			//console.log( $scope.imagesrc );
+		            			
+		            			if( $scope.response == "Uploaded" )
+		            			{
+		            				$scope.picUpdated = true;
+		            				$scope.currentImage = '${pageContext.request.contextPath}/' + $scope.imagesrc;
+		            				
+		            				
+		            			}
+		            			else
+		            			{
+									$scope.picUpdatedWithError = true;
+		            				
+		            	}
+		            			
+			    				
+		            		}
+			            , 
+			                function(errResponse)
+			                {
+			                	console.error('Error while Updating User.');
+			                } 
+		        	); */
+			
+			//console.log("File:");
+			//console.log(e.files[0]);
+		};
+		
 		$scope.toggleUpdatePassword = function(response)
 		{
 			console.log(JSON.stringify($scope.UserPasswordDetails));
@@ -184,8 +288,28 @@
 			{
 				if(response.status =="Updated")
 					{
-					System.out.println("Success");
+					console.log("Success");
+					
+					$scope.updated = response.status;
+    				
+    				window.setTimeout(function()
+    				{
+    					$scope.$apply( $scope.updated = '' );
+    				},3000);
+					
 					}
+				else
+				{
+					
+					console.log("Incorrect Password")
+				
+					$scope.updated = response.status;
+    				
+    				window.setTimeout(function()
+    				{
+    					$scope.$apply( $scope.updated = '' );
+    				},3000);
+				}
 					
 			  }
 		 ,
@@ -219,6 +343,7 @@
 			);
 		}
 		
+		$scope.fileforupload = null;
 		
 		$scope.letitbe = function()
 		{
@@ -240,18 +365,62 @@
 			console.log($scope.myerror);
 		}
 
-		$("#ffub").click(function() {
-			$("#ffu").trigger('click');
-		});
-
-		$("#ffu").on(
-				'change',
-				function(e) {
-					var filename = e.target.files[0].name;
-					//alert( filename.substring( filename.indexOf('.') , filename.length ) );
-					$scope.CheckValidFileType(filename.substring(filename.indexOf('.'), filename.length));
-		});
-}]);
+			$("#ffub").click(function() {
+				$("#ffu").trigger('click');
+			});
+			
+			$scope.fileforupload=null;
+			$("#ffu").on('change',function(e) 
+			{
+						var filename = e.target.files[0].name;
+						
+						$scope.fileforupload = e.target.files[0];
+						
+						var file = $scope.fileforupload;
+						
+						console.log($scope.fileforupload);
+						
+							var uploadUrl = "http://localhost:9001/buzzflock/updateProfilePicture/";
+					  	        
+				   		    var res = $fileUpload.uploadFileToUrl(file ,$scope.userdata.ProfileName , uploadUrl).then
+					  	        
+				   		    (
+					            		function(response)
+					            		{
+					            			$scope.response = response.status;
+					            			$scope.imagesrc = response.imagesrc;
+					            			
+					            			
+					            			$scope.userdata.ProfileImage = angular.copy(response.imagesrc);
+					            			console.log( $scope.response );
+					            			console.log( $scope.imagesrc );
+					            			
+					            			if( $scope.response == "Uploaded" )
+					            			{
+					            				$scope.picUpdated = true;
+					            				$scope.currentImage = '${pageContext.request.contextPath}/' + $scope.imagesrc;
+					            				
+					            				
+					            			}
+					            			else
+					            			{
+												$scope.picUpdatedWithError = true;
+					            				
+					            	}
+					            			
+						    				
+					            		}
+						            , 
+						                function(errResponse)
+						                {
+						                	console.error('Error while Updating User.');
+						                } 
+					        	);
+					  			
+				$scope.CheckValidFileType(filename.substring(filename.indexOf('.'), filename.length));
+						
+			});
+	}]);
 </script>
 
 
@@ -269,10 +438,11 @@
 
 			<tr>
 				<td> <br>
-					 <img id="profileImage" ng-src="{{data.ProfileImage}}"height=" 150px" width="200px">	
+					 <img id="profileImage" ng-src="{{userdata.ProfileImage}}"height=" 150px" width="200px">	
 					 <button id="ffub" class="btm btn-link">Choose Image</button>
-					 <input type="file" id="ffu" style="opacity: 0;" />
-					 <div class="text text-danger" ng-if=" myerror =='error' ">Invalid Image Type</div>
+					 <input type="file" id="ffu" style="opacity:0"  />
+					 
+					 <div class="text text-danger" ng-if=" myerror =='error' " >Invalid Image Type</div>
 				</td>
 			</tr>
 
@@ -348,16 +518,15 @@
 					
 					<tr>
 					<td>New Password</td>
-					<td><input type="text" class="form-control"  ng-if="password" value="{{UserPasswordDetails.NewPassword}}" ng-model="UserPasswordDetails.NewPassword"/>
+					<td><input type="text" class="form-control"  ng-if="password" value="{{UserPasswordDetails.NewPassword}}" ng-model="UserPasswordDetails.NewPassword" ng-change="CheckForNewPassword();"/>
+					<label ng-if="newpasswordCheck">Password Should be betweeen 6 to 15 Character</label>
 					</td>
 					</tr>
 					
 					<tr>
 					<td>Confirm New Password</td>
 					<td><input type="text" class="form-control" ng-if="password" value="{{UserPasswordDetails.ConfirmNewPassword}}" ng-model="UserPasswordDetails.ConfirmNewPassword" ng-change="CheckPassword();"/>							
-					
 					<label ng-if="matchpasswordCheck">New Password and Confirm Password Mismatch</label>
-					
 					</td>
 					</tr>
 					
@@ -376,7 +545,9 @@
 							<button class="btn btn-success" ng-if="password" ng-disabled="overallValidationPasswordCheck" >
 							
 								<span ng-click="toggleUpdatePassword();">Save</span>
+								<label class="alert alert-success" style="position: absolute; top: 490px; left: 530px; " ng-show="updated=='Updated'">Updated</label>
+								<label class="alert alert-danger" style="position: absolute; top: 490px; left: 530px; " ng-show="updated=='Password Incorrect'">Incorrect Password</label>
 							</button>
 		 </div>
- 
+ <br><br><br>
  </html>
