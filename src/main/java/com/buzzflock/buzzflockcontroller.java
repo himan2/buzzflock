@@ -49,6 +49,12 @@ public class buzzflockcontroller {
 		return "index";
 	}
 	
+	@RequestMapping(value="/searchnewfriend")
+	public String searchnewfreind()
+	{
+		return "searchnewfriend";
+	}
+	
 	@RequestMapping("/profile")
 	public ModelAndView prfl() {
 

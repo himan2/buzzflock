@@ -77,6 +77,7 @@ public class RESTbuzzflockController {
 			json.put("ProfileGender", p.getGender());
 			json.put("ProfilePhone", p.getPhone());
 			json.put("ProfileLocation", p.getLocation());
+			json.put("ProfileImage", p.getImage());
 	    	
 	    }
 		
@@ -291,6 +292,110 @@ public class RESTbuzzflockController {
         
         return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
     }
-	
+
+	@CrossOrigin
+	@RequestMapping(value = "/fetchAllItems/", method = RequestMethod.POST)
+	public ResponseEntity<String> fetchAllItems(HttpServletRequest request, HttpServletResponse response,
+			UriComponentsBuilder ucBuilder) {
+		
+		String user = null;
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if (auth != null && !auth.getName().equals("anonymousUser"))
+	    {   
+	    	System.out.println(auth.getName());
+	    	user = auth.getName();
+	    }
+	    
+	    JSONArray jarr = new JSONArray();
+		
+
+		List<Profile> list = ps.getAllUsers();
+		
+		
+		for (Profile p : list) 
+
+		{
+			if(!p.getUsername().equals(user))
+	{
+			JSONObject jobj = new JSONObject();
+			System.out.println(p.getUsername());
+			jobj.put("ProfileID", p.getID());
+			jobj.put("ProfileName", p.getUsername());
+			jobj.put("ProfileEmail", p.getEmail());
+			jobj.put("ProfileImage", p.getImage());
+
+			jarr.add(jobj);
+		}else
+		{
+			System.out.println("match");
+			
+		}
+		
+		}
+		return new ResponseEntity<String>(jarr.toString(), HttpStatus.CREATED);
 	}
+	
+	@CrossOrigin
+    @RequestMapping(value = "/AddFriend/", method = RequestMethod.POST )
+    public ResponseEntity<String> AddFriend(HttpServletRequest request , HttpServletResponse response, @RequestBody String data, UriComponentsBuilder ucBuilder) 
+	{
+
+	/*String subject = request.getParameter("FriendID");
+		System.out.println(subject);
+*/		
+		System.out.println(data);
+		String user = null;
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null && !auth.getName().equals("anonymousUser"))
+		{   
+				System.out.println(auth.getName());
+				user = auth.getName();
+		}
+
+		
+		
+		JSONObject json = new JSONObject();
+		JSONParser jpar = new JSONParser();
+		 
+		try
+		{
+			json = (JSONObject)jpar.parse(data);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		String pass = json.get("FriendID").toString();
+		String IDfriend = json.get("ProfileID").toString();
+    	System.out.println(pass);
+    	System.out.println(IDfriend);
+    	
+    	List <Profile> list = ps.getAllUsers();
+    	  
+	    if( user != null )
+	  {
+	    	Profile p = ps.getUser(pass);
+	    	
+    	if(p.getUsername().equals(pass))	
+    	{
+    		System.out.print(p.getUsername());
+    		p.setPendingFriendList("IDfriend");
+           	ps.updateUser(p);
+		   
+         }
+    	
+    }
+    	json.put("status", "Updated");
+    	
+        System.out.println(json.toString());
+	
+		return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
+    }
+	
+	
+}
+
 	

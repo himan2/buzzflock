@@ -8,6 +8,15 @@
 <c:import url="head-meta.jsp"></c:import>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
+
+<style type="text/css">
+
+body {
+	background: url(resources/images/img6.jpg) no-repeat center center fixed;
+}
+
+</style>
+
 </head>
 
 <script >
@@ -427,11 +436,16 @@
 <body ng-app="myApp" ng-controller="abc">
 <c:import url="head.jsp"/>
 
-	
+	<div>
+<a href= "${ pageContext.request.contextPath}/searchnewfriend" type="button" class="btn btn-success pull-right">All Profile</a>
+</div><br><br>
 
 
 <div class="container">
-<table class="table ">
+<div class="row">
+<div class="col-sm-6">
+
+<table class="table " style="background-color: rgba(255,255,255,0.8);">
 
 	
 			<tbody>
@@ -504,8 +518,12 @@
 			</tr>
 		</tbody>
 	 </table>
+</div>
+</div>
+
 	 
-<table class=table>
+<div class="col-sm-6">
+<table class=table style="background-color: rgba(255,255,255,0.8);">
 <tbody ng-if="password">
 
 					<tr>
@@ -548,6 +566,8 @@
 								<label class="alert alert-success" style="position: absolute; top: 490px; left: 530px; " ng-show="updated=='Updated'">Updated</label>
 								<label class="alert alert-danger" style="position: absolute; top: 490px; left: 530px; " ng-show="updated=='Password Incorrect'">Incorrect Password</label>
 							</button>
+		 </div>
+		 </div>
 		 </div>
  <br><br><br>
  </html>
