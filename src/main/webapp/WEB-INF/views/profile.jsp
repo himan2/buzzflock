@@ -12,7 +12,7 @@
 <style type="text/css">
 
 body {
-	background: url(resources/images/img6.jpg) no-repeat center center fixed;
+	background: url(resources/images/wood.jpg) no-repeat center center fixed;
 }
 
 </style>
@@ -408,8 +408,7 @@ body {
 					            			{
 					            				$scope.picUpdated = true;
 					            				$scope.currentImage = '${pageContext.request.contextPath}/' + $scope.imagesrc;
-					            				
-					            				
+					            		
 					            			}
 					            			else
 					            			{

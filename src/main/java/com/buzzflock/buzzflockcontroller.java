@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -53,6 +54,57 @@ public class buzzflockcontroller {
 	public String searchnewfreind()
 	{
 		return "searchnewfriend";
+	}
+	
+	
+	@RequestMapping(value = "/viewprofile/{profileName}")
+	public ModelAndView addproduct1(@PathVariable("profileName") String name) {
+		ModelAndView mav = new ModelAndView("viewprofile");
+		System.out.println(name);
+		Profile p = us.getUser(name);
+		
+		System.out.println("profile"+p);
+		JSONArray jarr = new JSONArray();
+		JSONObject jobj = new JSONObject();
+		if (p != null) 
+		{
+			jobj.put("ProfileName", p.getUsername());
+			jobj.put("ProfileImage", p.getImage());
+			jobj.put("ProfileEmail", p.getEmail());
+			jobj.put("ProfileGender", p.getGender());
+			jobj.put("ProfileLocation", p.getLocation());
+			jobj.put("ProfilePhone", p.getPhone());
+			jarr.add(jobj);
+		}
+		
+		mav.addObject("mydata", jarr.toString());
+		System.out.println("ARRAY"+jarr.toString());
+		
+		return mav;
+
+	}
+	@RequestMapping(value="/blog/{ProfileName}")
+	public ModelAndView blog(@PathVariable("ProfileName") String username)
+	{
+		ModelAndView mav = new ModelAndView("blog");
+		Profile p = us.getUser(username);
+		System.out.println("user profile"+p);
+		JSONObject json = new JSONObject();
+		
+		if (p.getBlogs()==null)
+			{
+				System.out.println("Test 1");
+				mav.addObject("value","No blog");
+			}
+		else
+			{
+
+				System.out.println("Test 2");
+				
+				mav.addObject("value",p.getUsername());	
+			}
+		
+		return mav;
 	}
 	
 	@RequestMapping("/profile")

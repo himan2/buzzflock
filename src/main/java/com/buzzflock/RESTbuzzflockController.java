@@ -297,105 +297,440 @@ public class RESTbuzzflockController {
 	@RequestMapping(value = "/fetchAllItems/", method = RequestMethod.POST)
 	public ResponseEntity<String> fetchAllItems(HttpServletRequest request, HttpServletResponse response,
 			UriComponentsBuilder ucBuilder) {
-		
-		String user = null;
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    if (auth != null && !auth.getName().equals("anonymousUser"))
-	    {   
-	    	System.out.println(auth.getName());
-	    	user = auth.getName();
-	    }
-	    
-	    JSONArray jarr = new JSONArray();
-		
 
-		List<Profile> list = ps.getAllUsers();
-		
-		
-		for (Profile p : list) 
-
-		{
-			if(!p.getUsername().equals(user))
-	{
-			JSONObject jobj = new JSONObject();
-			System.out.println(p.getUsername());
-			jobj.put("ProfileID", p.getID());
-			jobj.put("ProfileName", p.getUsername());
-			jobj.put("ProfileEmail", p.getEmail());
-			jobj.put("ProfileImage", p.getImage());
-
-			jarr.add(jobj);
-		}else
-		{
-			System.out.println("match");
-			
-		}
-		
-		}
-		return new ResponseEntity<String>(jarr.toString(), HttpStatus.CREATED);
-	}
-	
-	@CrossOrigin
-    @RequestMapping(value = "/AddFriend/", method = RequestMethod.POST )
-    public ResponseEntity<String> AddFriend(HttpServletRequest request , HttpServletResponse response, @RequestBody String data, UriComponentsBuilder ucBuilder) 
-	{
-
-	/*String subject = request.getParameter("FriendID");
-		System.out.println(subject);
-*/		
-		System.out.println(data);
 		String user = null;
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null && !auth.getName().equals("anonymousUser"))
-		{   
-				System.out.println(auth.getName());
-				user = auth.getName();
+		if (auth != null && !auth.getName().equals("anonymousUser")) {
+			// System.out.println(auth.getName());
+			user = auth.getName();
 		}
+
+		Profile P1 = ps.getUser(user);
+		JSONArray jarr = new JSONArray();
+		JSONParser jpartemp = new JSONParser();
+
+		try {
+
+			// System.out.println("Displaying List: "+
+			// P1.getPendingFriendList());
+			// System.out.println("Pending List ID"+ e);
+			List<Profile> list = ps.getAllUsers();
+			for (Profile p : list) {
+				// System.out.println("Verifying" );
+				if (!p.getUsername().equals(user)) {
+					JSONObject jobj = new JSONObject();
+					jobj.put("ProfileID", p.getID());
+					jobj.put("ProfileName", p.getUsername());
+					jobj.put("ProfileEmail", p.getEmail());
+					jobj.put("ProfileImage", p.getImage());
+
+					boolean check = true;
+					JSONArray jarr1;
+					jarr1 = new JSONArray();
+					if (check) 
+					{
+					if(P1.getPendingFriendList() != null)	
+						{
+						jarr1 = (JSONArray) jpartemp.parse(P1.getPendingFriendList());// login
+																						// user
+																						// array
+						for (Object e : jarr1) {
+							if (e.equals(p.getID().toString())) {
+								jobj.put("ProfileAssociation", "pendingrequest");
+								check = false;
+								break;
+							}
+						}
+					
+						}}
+					System.out.println(p.getID());
+					System.out.println(check);
+					if (check) 
+					{
+						if(P1.getRequestSent()!= null)
+							{
+								jarr1 = new JSONArray();
+								jarr1 = (JSONArray) jpartemp.parse(P1.getRequestSent());// login// user// request// sent
+								System.out.println(jarr1);
+								for (Object e : jarr1) 
+									{
+										System.out.println(e);
+										System.out.println(p.getID());
+											if (e.equals(p.getID().toString())) 
+												{
+													System.out.println("request sent");
+													jobj.put("ProfileAssociation", "Sent");
+													check = false;
+													break;
+												}
+									}
+							}
+					}
+					if (check) 
+					{
+						if(P1.getFriendList()!= null)
+							{
+								jarr1 = new JSONArray();
+								jarr1 = (JSONArray) jpartemp.parse(P1.getFriendList());// login// user// request// sent
+								System.out.println(jarr1);
+								for (Object e : jarr1) 
+									{
+										System.out.println(e);
+										System.out.println(p.getID());
+											if (e.equals(p.getID().toString())) 
+												{
+													System.out.println("Friends");
+													jobj.put("ProfileAssociation", "Friend");
+													check = false;
+													break;
+												}
+									}
+							}
+					}
+
+					if (check) {
+
+						jobj.put("ProfileAssociation", "notfriend");
+						check = false;
+
+					}
 
 		
 		
-		JSONObject json = new JSONObject();
-		JSONParser jpar = new JSONParser();
-		 
-		try
-		{
-			json = (JSONObject)jpar.parse(data);
-		}
-		catch(Exception e)
-		{
+					jarr.add(jobj);
+				}
+			}
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		/*finally
+		{
+			List<Profile> list1 = ps.getAllUsers();
+			
+			for (Profile p1 : list1) {
+				
+			JSONObject jobj = new JSONObject();
+			jobj.put("ProfileID", p1.getID());
+			jobj.put("ProfileName", p1.getUsername());
+			jobj.put("ProfileEmail", p1.getEmail());
+			jobj.put("ProfileImage", p1.getImage());
+			jobj.put("Profileassociation","Empty");
+			jarr.add(jobj);
+		}
+	}
+*/		System.out.println(jarr);
 
-		String pass = json.get("FriendID").toString();
-		String IDfriend = json.get("ProfileID").toString();
-    	System.out.println(pass);
-    	System.out.println(IDfriend);
-    	
-    	List <Profile> list = ps.getAllUsers();
-    	  
-	    if( user != null )
-	  {
-	    	Profile p = ps.getUser(pass);
-	    	
-    	if(p.getUsername().equals(pass))	
-    	{
-    		System.out.print(p.getUsername());
-    		p.setPendingFriendList("IDfriend");
-           	ps.updateUser(p);
-		   
-         }
-    	
-    }
-    	json.put("status", "Updated");
-    	
-        System.out.println(json.toString());
+		return new ResponseEntity<String>(jarr.toString(), HttpStatus.CREATED);
+	}
+
 	
+	@CrossOrigin
+	@RequestMapping(value = "/AddFriend/", method = RequestMethod.POST)
+	public ResponseEntity<String> AddFriend(HttpServletRequest request, HttpServletResponse response,@RequestBody String data, UriComponentsBuilder ucBuilder) 
+	{
+			System.out.println(data);
+			String user = null;
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth != null && !auth.getName().equals("anonymousUser")) 
+				{
+					// System.out.println(auth.getName());
+					user = auth.getName();
+				}
+			JSONObject json = new JSONObject();
+			JSONParser jpar = new JSONParser();
+			try 
+				{
+					json = (JSONObject) jpar.parse(data);
+				} 
+			catch (Exception e) 
+				{
+					e.printStackTrace();
+				}
+			String pass = json.get("FriendID").toString();
+			String IDfriend = json.get("ProfileID").toString();
+			System.out.println(pass);
+			System.out.println(IDfriend);
+			// List <Profile> list = ps.getAllUsers();
+			Profile p = ps.getUser(pass);
+			Profile myp = ps.getUser(user);
+		
+			if (user != null) 
+				{
+						if (p.getPendingFriendList() == null && myp.getRequestSent() == null) 
+							{
+								System.out.println("1");
+								JSONArray jarr = new JSONArray();
+								JSONArray jarr1 = new JSONArray();
+								jarr.add(myp.getID().toString());
+								jarr1.add(IDfriend.toString());
+								p.setPendingFriendList(jarr.toJSONString());
+								myp.setRequestSent(jarr1.toJSONString());
+								p.setCPassword(p.getPassword());
+								myp.setCPassword(myp.getPassword());
+								ps.updateUser(p);
+								ps.updateUser(myp);	
+							} 
+			else
+				{
+					System.out.println("3");
+					JSONArray jarr = new JSONArray();
+					JSONParser jpartemp = new JSONParser();
+					JSONArray jarr1 = new JSONArray();
+					JSONParser jpartemp1 = new JSONParser();
+
+					try 
+						{
+							jarr = (JSONArray) jpartemp.parse(p.getPendingFriendList());// friend
+							jarr1 = (JSONArray) jpartemp1.parse(myp.getRequestSent());// user
+							System.out.println("array 1" + jarr);
+							System.out.println("array2" + jarr1);
+						}
+					catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					if (!jarr.contains(myp.getID().toString())) 
+						{
+						if (!jarr1.contains(p.getID().toString()))
+					
+							{	
+								System.out.println("last loop");
+								jarr.add(myp.getID().toString());
+								jarr1.add(p.getID().toString());
+								p.setPendingFriendList(jarr.toJSONString());
+								myp.setRequestSent(jarr1.toString());
+							}
+						
+						}
+					try 
+					{
+						p.setCPassword(p.getPassword());
+						myp.setCPassword(myp.getPassword());
+						ps.updateUser(p);
+						ps.updateUser(myp);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+				JSONObject rjson = new JSONObject();
+				rjson.put("status", "Updated");
+				rjson.put("ProfileAssociation", "Sent");
+				rjson.put("ProfileID",p.getID());
+				
+				System.out.println(rjson.toString());
+				return new ResponseEntity<String>(rjson.toString(), HttpStatus.CREATED);
+		}
+	
+	@CrossOrigin
+	@RequestMapping(value="/AcceptRequest/",method=RequestMethod.POST)
+	public ResponseEntity<String> AcceptRequest(HttpServletRequest req, HttpServletResponse res, @RequestBody String data , UriComponentsBuilder uri)
+	{
+			System.out.println(data);
+			String user=null;
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if(authentication != null && !authentication.getName().equals("anonymouseUser"))
+			{
+				user = authentication.getName();
+				System.out.println("login User "+user);
+			}
+			JSONObject json = new JSONObject();
+			JSONParser jpar = new JSONParser();
+			try
+			{	
+				json =  (JSONObject)jpar.parse(data);
+			}
+			catch(Exception e)
+			{
+			e.printStackTrace();	
+			}
+			System.out.println(json);
+			String usertoadd = json.get("FriendName").toString();
+			String idtoadd =json.get("ProfileID").toString();
+			System.out.println("USERNAME TO ACCEPT REQUEST"+ usertoadd);
+			System.out.println("USERID TO ACCEPT REQUEST"+ idtoadd);
+			
+			Profile p1 = ps.getUser(usertoadd);//profiletoadd
+			Profile p2 = ps.getUser(user);//userprofile
+			System.out.println("Profile of Friend "+ p1);
+			System.out.println("User PRofile of login user"+ p2);
+			System.out.println(p2.getFriendList());
+			System.out.println(p1.getFriendList());
+			
+			if(user != null)
+			{
+				if(p2.getFriendList()==null && p1.getFriendList()==null)
+				{
+					System.out.println("If friend list is empty");
+					JSONArray jarr = new JSONArray();
+					JSONArray jarr2 = new JSONArray();
+					JSONArray jarr3 = new JSONArray();
+					JSONArray jarr4 = new JSONArray();
+					
+					jarr.add(p2.getID().toString());
+					jarr2.add(p1.getID().toString());
+					jarr3.remove(p2.getID().toString());
+					jarr4.remove(p1.getID().toString());
+					
+					p1.setFriendList(jarr.toString());
+					p2.setPendingFriendList(jarr3.toString());
+					p1.setRequestSent(jarr4.toString());
+					p1.setCPassword(p1.getPassword());
+					p2.setFriendList(jarr2.toString());
+					p2.setCPassword(p2.getPassword());
+					ps.updateUser(p1);
+					ps.updateUser(p2);
+
+				}
+			else
+			{
+				System.out.println("else part");
+				JSONArray jarr = new JSONArray();
+				JSONArray jarr1 = new JSONArray();
+				JSONParser jpar0 = new JSONParser();
+				JSONParser jpar1 = new JSONParser();
+			try
+				{
+					jarr= (JSONArray)jpar0.parse(p1.getFriendList());
+					jarr1=(JSONArray)jpar1.parse(p2.getFriendList());
+					System.out.println(jarr);
+					System.out.println(jarr1);
+				}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+				if(!jarr.contains(p2.getID()))
+							{
+							if(!jarr1.contains(p1.getID()))
+								{
+								try
+								{
+								
+									jarr.add(p2.getID());
+									jarr1.add(p1.getID());
+									p1.setFriendList(jarr.toString());
+									p2.setFriendList(jarr1.toString());
+									p1.setCPassword(p1.getPassword());
+									p2.setCPassword(p2.getPassword());
+									System.out.println("qqq "+p1.getFriendList());
+									System.out.println("dfdsfsd "+p2.getFriendList());
+							
+										ps.updateUser(p1);
+									ps.updateUser(p2);
+									}
+
+								catch(Exception e)
+									{
+										e.printStackTrace();
+									}
+								
+								}
+							
+							}
+
+									
+							}
+					
+						
+					}
+				
+					
+			
+			JSONObject json1 = new JSONObject();
+			json1.put("status","Updated");
+			json1.put("ProfileAssociation", "friend");
+			json1.put("ProfileID",p1.getID());
+			System.out.println(json.toString());
+			
+			return  new ResponseEntity<String>(json1.toString() , HttpStatus.CREATED);
+		
+	}
+		
+	@CrossOrigin
+	@RequestMapping(value = "/Delete/", method = RequestMethod.POST)
+	public ResponseEntity<String> DeleteFriend(HttpServletRequest req, HttpServletResponse res,@RequestBody String data, UriComponentsBuilder uri) {
+		System.out.println(data);
+		String user = "null";
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && !authentication.getName().equals("anonymousUser")) 
+			{
+				System.out.println(authentication.getName());
+				user = authentication.getName();
+			}
+
+		JSONObject json = new JSONObject();
+		JSONParser jpar = new JSONParser();
+		try {
+				json = (JSONObject) jpar.parse(data);
+			} 
+		catch (Exception e) 	
+			{
+				e.printStackTrace();
+			}
+		System.out.println(json);
+		String pass = json.get("ProfileID").toString();
+		String name = json.get("FriendID").toString();
+		
+
+		System.out.println(name);
+		System.out.println(pass);
+		Profile P1 = ps.getUser(user);
+		Profile P2 = ps.getUser(name);
+		// System.out.println(P1.getPendingFriendList().toString());
+
+		if (user != null) 
+			{
+				System.out.println("test 1 passed");
+				JSONArray jarr = new JSONArray();
+				JSONArray jarr1 = new JSONArray();
+				JSONParser jpartemp = new JSONParser();
+				JSONParser jpartemp1 = new JSONParser();
+			try 
+				{
+					System.out.println("test 2 passed");
+					jarr = (JSONArray) jpartemp.parse(P1.getRequestSent());
+					jarr1 = (JSONArray) jpartemp1.parse(P2.getPendingFriendList());
+					
+					System.out.println("before test 3"+jarr.toJSONString());
+					if (jarr.contains(pass)) 
+						{
+							System.out.println("test 3 passed");
+							System.out.println(jarr.toJSONString());
+							System.out.println(jarr1.toJSONString());
+							jarr.remove(pass);
+							jarr1.remove(P1.getID());
+							System.out.println(jarr.toJSONString());
+							System.out.println(jarr1.toJSONString());
+							
+							P1.setRequestSent(jarr.toString());
+							P1.setCPassword(P1.getPassword());
+							
+							P2.setPendingFriendList(jarr1.toJSONString());
+							P2.setCPassword(P2.getPassword());
+							
+							ps.updateUser(P1);
+							ps.updateUser(P2);
+						}
+				}
+
+			catch (Exception e) 
+				{
+					e.printStackTrace();
+				}
+
+			
+			json.put("status", "Deleted");
+			json.put("ProfileAssociation","notfriend");
+			json.put("ProfileID", P2.getID());
+
+		}
+
 		return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
-    }
-	
-	
-}
+	}
 
-	
+}

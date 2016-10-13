@@ -57,7 +57,17 @@ public class Profile implements Serializable
 	@Lob
 	private String Gallery;
 	
+	@Lob
+	private String RequestSent;
 	
+	public String getRequestSent() {
+		return RequestSent;
+	}
+
+	public void setRequestSent(String requestSent) {
+		RequestSent = requestSent;
+	}
+
 	private String BasicInfo;
 	
 	public String getFriendList() {
