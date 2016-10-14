@@ -98,7 +98,7 @@ body {
 		
 	    }
 	    ,
- 	    updatePassword: function(item)
+	    updatePassword: function(item)
 	    {
             return $http.post('http://localhost:9001/buzzflock/updatePassword/', item)
                     .then
@@ -115,7 +115,25 @@ body {
                     );
 		
 	    }
-	    };}]);
+	    ,
+	    updateImage: function(item)
+	    {
+            return $http.post('http://localhost:9001/buzzflock/updateImage/', item)
+                   .then
+                    (
+                            function(response)
+                            {
+                            	console.log($scope.updateImage);
+                                return response.data;
+                            }, 
+                            function(errResponse)
+                            {
+                                console.error('Error while updating User');
+                                return $q.reject(errResponse);
+                            }
+                    );
+		}
+};}]);
 	
 	
 	
@@ -569,4 +587,21 @@ body {
 		 </div>
 		 </div>
  <br><br><br>
+ 
+ </table>
+	 <table style="width: 80%;" class="table">
+					
+					<tr>
+						<ul style="font-style: italic;font-weight: bold;font-size: 16px;font-family: Segoe UI, Tahoma, sans-serif; color: #333333; padding: 5px; opacity: 0.8; line-height: 20px;" class="list-group">
+							<a href="${pageContext.request.contextPath}/blog/" class="list-group-item profile-list-group-item"><li > Blogs</li></a>
+							<a href="${pageContext.request.contextPath}/forum/{{userdata.ProfileName}}" class="list-group-item profile-list-group-item"><li> Forums</li></a>
+							<a href="${pageContext.request.contextPath}/gallery/{{userdata.ProfileName}}" class="list-group-item profile-list-group-item"><li> Gallery</li></a>							
+						</ul>
+					</tr>
+									  	
+					<br>
+									  	
+				</table>
+ 
+ 
  </html>

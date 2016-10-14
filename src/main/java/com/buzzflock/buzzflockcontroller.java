@@ -1,7 +1,14 @@
 package com.buzzflock;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -22,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.buzzflock.Blog.Blog;
+import com.buzzflock.Blog.BlogService;
 import com.buzzflock.ProfileModel.Profile;
 import com.buzzflock.ProfileModel.ProfileService;
 import com.buzzflock.ProfileRole.ProfileRoleService;
@@ -37,6 +46,13 @@ public class buzzflockcontroller {
 	
 	@Autowired
 	JavaMailSender mail;
+	
+	@Autowired
+	BlogService bs;
+	
+	@Autowired
+	ServletContext context;
+
 	
 	@RequestMapping(value="/")	
 	public String home()
@@ -83,32 +99,146 @@ public class buzzflockcontroller {
 		return mav;
 
 	}
-	@RequestMapping(value="/blog/{ProfileName}")
-	public ModelAndView blog(@PathVariable("ProfileName") String username)
+	
+	@RequestMapping(value="/blog")
+	public ModelAndView blog()
 	{
-		ModelAndView mav = new ModelAndView("blog");
-		Profile p = us.getUser(username);
-		System.out.println("user profile"+p);
-		JSONObject json = new JSONObject();
 		
-		if (p.getBlogs()==null)
-			{
-				System.out.println("Test 1");
-				mav.addObject("value","No blog");
-			}
-		else
-			{
-
-				System.out.println("Test 2");
-				
-				mav.addObject("value",p.getUsername());	
-			}
+		ModelAndView mav = new ModelAndView("blog");
+		JSONArray jarr = new JSONArray();
+		
+		List<Blog> list = bs.getAllBlogs();
+		
+		System.out.println(list);
+		for(Blog b: list)
+		{
+			JSONObject jobj = new JSONObject();	
+			jobj.put("BlogImage", b.getImage());
+			jobj.put("Topicname",b.getTopicname());
+			jobj.put("Description",b.getDescription());
+			jobj.put("Dateandtime",b.getTimestamp());
+			jobj.put("OwnerID",b.getOwnerID());
+			
+			jarr.add(jobj);
+		}
+		mav.addObject("data",jarr.toJSONString());
+		System.out.print(jarr);
 		
 		return mav;
 	}
 	
+	
+	@RequestMapping(value="/viewblog/{OwnerID}")
+	public ModelAndView viewblog(@PathVariable("OwnerID") String Id)
+	{
+		
+		ModelAndView mav = new ModelAndView("viewblog");
+		
+		return mav;
+		
+	}
+	
+	
+	
+	@RequestMapping(value="/addblog/")
+	public ModelAndView addblog() 
+	{
+		
+		
+		ModelAndView mav = new ModelAndView("addblog");
+		
+		mav.addObject("blog" , new Blog());
+		return mav;
+	}
+	
+	@RequestMapping(value = "/insertblog", method = RequestMethod.POST)
+	public String insertproduct(@ModelAttribute("blog") Blog p) 
+	{
+		String user = "";
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null && !auth.getName().equals("anonymousUser")) 
+		{
+			user = auth.getName();
+		}
+			Profile p1 = us.getUser(user);
+		
+			DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+			Date dateobj = new Date();
+			System.out.println(df.format(dateobj));
+			p.setOwnerID(p1.getID().toString());
+			p.setTimestamp(df.format(dateobj));
+			bs.insert(p);
+			
+			/*JSONObject jobj= new JSONObject();
+			JSONParser jpar= new JSONParser();
+			try
+			{
+				jobj = (JSONObject) jpar.parse(p.toString());
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		
+			String id = jobj.get("Topicname").toString();
+			System.out.println(id);
+*/			
+				
+
+			try {
+				
+				Blog i1 = bs.getBlogWithMaxId();
+				
+				System.out.println(i1.getBlogID().toString());
+				
+			
+				String path = context.getRealPath("/");
+
+				System.out.println(path);
+
+				File directory = null;
+
+				// System.out.println(ps.getProductWithMaxId());
+
+				if (p.getProductFile().getContentType().contains("image"))
+					
+				{
+					directory = new File(path + "\\resources\\images");
+
+					System.out.println(directory);
+					byte[] bytes = null;
+					File file = null;
+					bytes = p.getProductFile().getBytes();
+
+					if (!directory.exists())
+						directory.mkdirs();
+
+					file = new File(directory.getAbsolutePath() + System.getProperty("file.separator") + "image_" + i1.getBlogID() + ".jpg");
+
+					System.out.println(file.getAbsolutePath());
+
+					BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
+					stream.write(bytes);
+					stream.close();
+
+				}
+
+				i1.setImage("resources/images/image_" + i1.getBlogID() + ".jpg");
+
+				bs.update(i1);
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}
+
+			return "redirect:blog";
+		}
+	
 	@RequestMapping("/profile")
-	public ModelAndView prfl() {
+	public ModelAndView prfl() 
+	{
 
 		String username = "";
 		
@@ -118,28 +248,37 @@ public class buzzflockcontroller {
 	    	username = auth.getName();
 	    	
 	    }
-	    
-		ModelAndView mav = new ModelAndView("profile");
-
-		JSONObject jobj = new JSONObject();
+	    ModelAndView mav = new ModelAndView("profile");
 		
+/* 
+		Profile p = as.get(username);
+		
+		System.out.println(p.getUsername());
+		
+		mav.addObject("dataValue",p );
+		   mav.addObject("userName", p.getUsername());
+*/
+		
+/*	JSONArray jarr = new JSONArray();
+*/		
+		JSONObject jobj = new JSONObject();
 		List<Profile> list = us.getAllUsers();
 		
 		for (Profile p : list) {
 			
 			if( p.getUsername().equals(username) )
 			{
-								
+				jobj.put("ProfileName", p.getUsername());
 				jobj.put("ProfileImage", p.getImage());
-				jobj.put("Username", p.getUsername());
-				jobj.put("Email", p.getEmail());
-				jobj.put("Gender", p.getGender());
-				jobj.put("Phone", p.getPhone());
+				jobj.put("ProfileGender", p.getGender());
+				jobj.put("ProfileLocation", p.getLocation());
+				jobj.put("ProfilePhone", p.getPhone());
 				
 				
-			}
+				
+/*				jarr.add(jobj);
+*/			}				
 		}
-
 		mav.addObject("data", jobj.toJSONString());
 
 		return mav;

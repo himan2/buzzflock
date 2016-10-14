@@ -55,6 +55,7 @@ xmlns="http://www.springframework.org/schema/beans"
 		<list>
 		<value>com.buzzflock.ProfileModel</value>
 		<value>com.buzzflock.ProfileRole</value>
+<value>com.buzzflock.Blog</value>
 		</list>
 		</property>
 		

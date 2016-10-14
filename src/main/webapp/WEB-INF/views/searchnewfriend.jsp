@@ -10,11 +10,9 @@
 <c:import url="head-meta.jsp"></c:import>
 
 <style type="text/css">
-
 body {
 	background: url(resources/images/web.jpg) no-repeat center center fixed;
 }
-
 </style>
 
 </head>
@@ -25,7 +23,7 @@ body {
 		
 	    return {
 	    	
-			fetchAllItems: function() 
+	    	fetchAllItems: function() 
 			{
 									return $http
 											.post('http://localhost:9001/buzzflock/fetchAllItems/')
@@ -61,7 +59,42 @@ body {
 					);
 		}
 		,
-	    AddFriend: function(item)
+	    IgnoreFriend: function(item)
+	    {
+            					return $http.post('http://localhost:9001/buzzflock/IgnoreFriend/', item)
+                    						.then
+                    						(
+                            					function(response)
+                            					{
+                                					return response.data;
+                            					}, 
+                            						function(errResponse)
+                            					{
+                                					console.error('Error while updating User');
+                                					return $q.reject(errResponse);
+                            					}
+                    						);
+         }
+,
+RemoveFriend: function(item)
+{
+    					return $http.post('http://localhost:9001/buzzflock/RemoveFriend/', item)
+            						.then
+            						(
+                    					function(response)
+                    					{
+                        					return response.data;
+                    					}, 
+                    						function(errResponse)
+                    					{
+                        					console.error('Error while updating User');
+                        					return $q.reject(errResponse);
+                    					}
+            						);
+ }
+		
+,
+		AddFriend: function(item)
 	    {
             					return $http.post('http://localhost:9001/buzzflock/AddFriend/', item)
                     						.then
@@ -100,144 +133,226 @@ body {
 	
 	
 	myApp.controller("abc", ['$scope','UserService',function($scope, $UserService) 
-			{
-			$scope.data;
-			$scope.currentUser = '${pageContext.request.userPrincipal.name}';
-			$scope.FriendName;
-			$scope.frequest;
-			$scope.cfrequest;
-			$scope.ProfileID;
-			$scope.toggle = false;
-			
-$UserService.fetchAllItems().then
-(
-					function(response) 
-					{
-						$scope.data = response;
-						console.log($scope.data);
-					}
-			,
-					function(errResponse)
-					{
-						console.error('Error while Sending Data.');
-					}
-);
-		
-$scope.AddFriend = function(ProfileID, ProfileName )
-{
-			$scope.frequest = {"ProfileID" : ProfileID ,"FriendID": ProfileName};
-		 	console.log($scope.frequest);
-			$UserService.AddFriend(JSON.stringify($scope.frequest))
-         		.then
-         		(
-         			function(response)
-         				{
-         				$scope.ProfileAssociation = response.ProfileAssociation;
-         				console.log(response.ProfileAssociation);
-            	/* 		
-         				$scope.data.ProfileAssociation = angular.copy(response.ProfileAssociation);
-         				console.log(data.ProfileAssociation);
-            	 */		
-         					
-            	 if( response.status == "Updated" )
-					{
-					
-						for( i = 0 ; i < $scope.data.length ; i++ )
-						{
-							if( $scope.data[i].ProfileID == response.ProfileID )
-							{
-								$scope.data[i].ProfileAssociation = response.ProfileAssociation;
-								
-								break;
-							}
-						}
-						
-						console.log( $scope.data )
-					}
-            				window.setTimeout(function()
-            				{
-            					$scope.$apply( $scope.ProfileAssociation = '' );
-            				},3000);
-         				}
-	            , 
-	                function(errResponse)
-	                	{
-	                		console.error('Error while Updating User.');
-	                	}	 
-					 );
-			
-};
-			$scope.updateOverall = function()
-			{
-				$scope.overallValidationCheck = $scope.toggle;
-			};
-$scope.AcceptRequest = function(ProfileID , ProfileName)
-		{
-				$scope.frequest = {"ProfileID" : ProfileID , "FriendName":ProfileName}
-				
-				$UserService.AcceptRequest(JSON.stringify($scope.frequest))
-					.then(
-							function(response)
-								{
-								if(response.status =="Updated")
-								{
-								for( i = 0 ; i < $scope.data.length ; i++ )
-         						{
-         							if( $scope.data[i].ProfileID == response.ProfileID )
-         							{
-         								$scope.data[i].ProfileAssociation = response.ProfileAssociation;
-         								break;
-         							}
-         						}
-         		
-									console.log(response.status);
-								}
-			        				window.setTimeout(function()
-			        				{
-			        					$scope.$apply( $scope.ProfileAssociation = '' );
-			        				},3000);
-									
-								},
-							function(errResponse)
-								{
-									console.error('Error while Updating Error');
-								}
-							);
-		};
-$scope.Delete = function(ProfileID, ProfileName )
-{
-	$scope.cfrequest = {"ProfileID" : ProfileID ,"FriendID": ProfileName};
-	console.log($scope.cfrequest);
-	$UserService.Delete(JSON.stringify($scope.cfrequest))
-			.then(
-      			function(response)
-      				{
-      					console.log( response.status );
-      					if( response.status == "Deleted" )
-      					{
- 							for( i = 0 ; i < $scope.data.length ; i++ )
-     						{
-     							if( $scope.data[i].ProfileID == response.ProfileID )
-     							{
-     								$scope.data[i].ProfileAssociation = response.ProfileAssociation;
-     								break;
-     							}
-     						}
-     		
- 							$scope.deleterequest = response.status;
-      						console.log( response.status );
-      						
-      					}
- 						$scope.toggle = false;
-      				}, 
-	             function(errResponse)
-	                {
-	                	console.error('Error while Updating User.');
-	                } 
-  	 				);
-};
-}]);
-</script>
+	             			{
+	             			$scope.data;
+	             			$scope.password=false;
+	             			$scope.currentUser = '${pageContext.request.userPrincipal.name}';
+	             			$scope.FriendName;
+	             			$scope.frequest;
+	             			$scope.cfrequest;
+	             			$scope.ProfileID;
+	             			$scope.toggle = false;
+	             			
+	             $UserService.fetchAllItems().then
+	             (
+	             					function(response) 
+	             					{
+	             						$scope.data = response;
+	                         			console.log($scope.data);
+	             					}
+	             			,
+	             					function(errResponse)
+	             					{
+	             						console.error('Error while Sending Data.');
+	             					}
+	             );
+	             		
+	             $scope.AddFriend = function(ProfileID, ProfileName )
+	             {
+	             			$scope.frequest = {"ProfileID" : ProfileID ,"FriendID": ProfileName};
+	             		 	console.log($scope.frequest);
+	             			$UserService.AddFriend(JSON.stringify($scope.frequest))
+	                      		.then
+	                      		(
+	                     			
+	                      			function(response)
+	                      				{
+	                      				
+	                      					console.log( response );
+	                      				
+	                      				//$scope.data.ProfileAssociation = response.ProfileAssociation;
+	                      					if( response.status == "Updated" )
+	                      					{
+	                      						$scope.update = response.status;
+	                 						
+	                      						for( i = 0 ; i < $scope.data.length ; i++ )
+	                      						{
+	                      							if( $scope.data[i].ProfileID == response.ProfileID )
+	                      							{
+	                      								$scope.data[i].ProfileAssociation = response.ProfileAssociation;
+	                      							
+	                      		         				break;
+	                      							}
+	                      						}
+	                      						window.setTimeout(function()
+	              		                 				{
+	              		                 					$scope.$apply( $scope.update = '' );
+	              		                 				},3000);
+	                      						
+	                      						console.log( $scope.data )
+	                      					}
+	                      											
+	             		}
+	             	            , 
+	             	                function(errResponse)
+	             	                	{
+	             	                		console.error('Error while Updating User.');
+	             	                	}	 
+	             					 );
+	             			
+	             };
+	             			$scope.updateOverall = function()
+	             			{
+	             				$scope.overallValidationCheck = $scope.toggle;
+	             			};
+	             			
+	             			
+//////////////////////////////////////	             			
+	             			$scope.RemoveFriend = function(ProfileID , ProfileName)
+	             			{
+	             					$scope.frequest = {"ProfileID" : ProfileID , "FriendName":ProfileName}
+	             					
+	             					$UserService.RemoveFriend(JSON.stringify($scope.frequest))
+	             						.then(
+	             								function(response)
+	             									{
+	             										$scope.update=response.status;
+	             										if(response.status =="Deleted")
+	             											{
+	             											for( i = 0 ; i < $scope.data.length ; i++ )
+	             			         						{
+	             			         							if( $scope.data[i].ProfileID == response.ProfileID )
+	             			         							{
+	             			         								$scope.data[i].ProfileAssociation = response.ProfileAssociation;
+	             			         								break;	
+	             			         							}
+	             			         						
+	             			         							window.setTimeout(function()
+	             			     		                 				{
+	             			     		                 					$scope.$apply( $scope.update = '' );
+	             			     		                 				},3000);
+	             			     		         				
+	             			         						}
+	             			         		
+	             												console.log(response.status);
+	             											}
+	             		
+	             									},
+	             								function(errResponse)
+	             									{
+	             										console.error('Error while Updating Error');
+	             									}
+	             								);
+	             			};
+	             			
+	             $scope.AcceptRequest = function(ProfileID , ProfileName)
+	             		{
+	             				$scope.frequest = {"ProfileID" : ProfileID , "FriendName":ProfileName}
+	             				
+	             				$UserService.AcceptRequest(JSON.stringify($scope.frequest))
+	             					.then(
+	             							function(response)
+	             								{
+	             									$scope.update=response.status;	
+	             									if(response.status =="Updated")
+	             										{
+	             										for( i = 0 ; i < $scope.data.length ; i++ )
+	             		         						{
+	             		         							if( $scope.data[i].ProfileID == response.ProfileID )
+	             		         							{
+	             		         								$scope.data[i].ProfileAssociation = response.ProfileAssociation;
+	             		         								break;
+	             		         							}
+	             		         						}
+	             		         		
+	             											console.log(response.status);
+	             										}
+	             			        				window.setTimeout(function()
+	             			        				{
+	             			        					$scope.$apply( $scope.update = '' );
+	             			        				},3000);
+	             									
+	             								},
+	             							function(errResponse)
+	             								{
+	             									console.error('Error while Updating Error');
+	             								}
+	             							);
+	             		};
+	             $scope.Delete = function(ProfileID, ProfileName )
+	             {
+	             	$scope.cfrequest = {"ProfileID" : ProfileID ,"FriendID": ProfileName};
+	             	console.log($scope.cfrequest);
+	             	$UserService.Delete(JSON.stringify($scope.cfrequest))
+	             			.then(
+	                   			function(response)
+	                   				{
+	                   					$scope.update=response.status;
+	                   					console.log( response.status );
+	              						if( response.status == "Deleted" )
+	                   					{
+	              							for( i = 0 ; i < $scope.data.length ; i++ )
+	                  						{
+	                  							if( $scope.data[i].ProfileID == response.ProfileID )
+	                  							{
+	                  								$scope.data[i].ProfileAssociation = response.ProfileAssociation;
+	                  								break;
+	                  							}
+	                  							
+	                  							
+	                  						}
+	              							window.setTimeout(function()
+	             		                 				{
+	             		                 					$scope.$apply( $scope.update = '' );
+	             		                 				},3000);
+	             		         				
+	                  		
+	              							$scope.deleterequest = response.status;
+	                   						console.log( response.status );
+	                   						
+	                   					}
+	              						$scope.toggle = false;
+	                   				}, 
+	             	             function(errResponse)
+	             	                {
+	             	                	console.error('Error while Updating User.');
+	             	                } 
+	               	 				);
+	             };
+	             $scope.IgnoreFriend = function(ProfileID, ProfileName )
+	             {
+	             	$scope.cfrequest = {"ProfileID" : ProfileID ,"FriendID": ProfileName};
+	             	console.log($scope.cfrequest);
+	             	$UserService.IgnoreFriend(JSON.stringify($scope.cfrequest))
+	             			.then(
+	                   			function(response)
+	                   				{
+	                   					console.log( response.status );
+	              						if( response.status == "Deleted" )
+	                   					{
+	              							for( i = 0 ; i < $scope.data.length ; i++ )
+	                  						{
+	                  							if( $scope.data[i].ProfileID == response.ProfileID )
+	                  							{
+	                  								$scope.data[i].ProfileAssociation = response.ProfileAssociation;
+	                  								break;
+	                  							}
+	                  						}
+	                  		
+	              							$scope.deleterequest = response.status;
+	                   						console.log( response.status );
+	                   						
+	                   					}
+	              						$scope.toggle = false;
+	                   				}, 
+	             	             function(errResponse)
+	             	                {
+	             	                	console.error('Error while Updating User.');
+	             	                } 
+	               	 				);
+	             };
+	             }]);
+	             </script>
 
 <body ng-app="myApp" ng-controller="abc">
 <c:import url="head.jsp"></c:import>
@@ -256,7 +371,7 @@ $scope.Delete = function(ProfileID, ProfileName )
 	 			<button type="button"  class="btn btn-success" ng-show="data.ProfileAssociation =='notfriend'"  ng-click="AddFriend(data.ProfileID,data.ProfileName);">Add friend</button>
 				<button type="button"  class="btn btn-success"  ng-show="data.ProfileAssociation=='pendingrequest'" ng-click="AcceptRequest(data.ProfileID ,data.ProfileName)">Accept Request</button>
 				<button type="button"  class="btn btn-success"  ng-show="data.ProfileAssociation=='pendingrequest'" >Ignore</button>
-				<button type="button" class="btn btn-success" ng-model= "data.ProfileAssociation"  value="{{data.ProfileAssociation}}" ng-show="data.ProfileAssociation=='Sent'" ng-click="Delete(data.ProfileID,data.ProfileName);">Cancel Request(click to undo)</button>
+				<button type="button" class="btn btn-success" ng-model= "data.ProfileAssociation"  value="{{data.ProfileAssociation}}" ng-show="data.ProfileAssociation=='Sent'" ng-click="Delete(data.ProfileID,data.ProfileName);">Cancel Request</button>
 			 	<button type="button" class="btn btn-success" ng-show="data.ProfileAssociation=='Friend'" >Friends</button>
 			 	<td>
 			 		<label class="alert alert-success" ng-show="data.ProfileAssociation =='Sent'">Updated</label>
