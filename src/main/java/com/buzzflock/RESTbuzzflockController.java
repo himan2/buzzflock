@@ -5,6 +5,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -35,6 +38,10 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.buzzflock.BlogComment.BlogComment;
+import com.buzzflock.BlogComment.BlogCommentService;
+import com.buzzflock.BlogContent.BlogContent;
+import com.buzzflock.BlogContent.BlogContentService;
 import com.buzzflock.ProfileModel.Profile;
 import com.buzzflock.ProfileModel.ProfileService;
 
@@ -50,6 +57,12 @@ public class RESTbuzzflockController {
 	@Autowired
 	ServletContext context;
 
+	@Autowired
+	BlogContentService bcs;
+	
+	@Autowired
+	BlogCommentService bcms;
+	
 
 	@CrossOrigin
 	@RequestMapping(value = "/getUserDetails/", method = RequestMethod.POST)
@@ -972,4 +985,186 @@ public ResponseEntity<String> AcceptRequest(HttpServletRequest req, HttpServletR
 	}
 
 	
+	@CrossOrigin
+	@RequestMapping(value = "/updateLike/", method = RequestMethod.POST)
+	public ResponseEntity<String> updateLikes(HttpServletRequest request, HttpServletResponse response,@RequestBody String data, UriComponentsBuilder ucBuilder) 
+	{
+			System.out.println(data);
+			JSONObject rjson = new JSONObject();					
+			String user = null;
+			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth != null && !auth.getName().equals("anonymousUser")) 
+				{
+					// System.out.println(auth.getName());
+					user = auth.getName();
+				}
+			Profile p = ps.getUser(user);
+			JSONObject jobj = new JSONObject();
+			JSONParser jpar = new JSONParser();
+			try
+			{
+				jobj = (JSONObject)jpar.parse(data);
+			}
+		catch(Exception e)
+			{
+			e.printStackTrace();
+			}
+			
+			String blogid = jobj.get("BlogID").toString();//Content ID of blogcontent table
+			System.out.println("content id"+blogid);
+			
+			
+			BlogContent bc = bcs.get(blogid);
+			System.out.println("bc.getContentID() is  "+bc.getContentID());
+			
+	if(bc.getLikeList()==null)
+	{
+			if(blogid.equals(String.valueOf(bc.getContentID()) ))
+			{	
+				System.out.println("Entered the if ");
+				JSONArray jarr = new JSONArray();
+				jarr.add(p.getID().toString());
+				bc.setLikeList(jarr.toString());
+				System.out.println(jarr.toString());
+				
+				bcs.update (bc);
+			}
+	
+	}
+	else 
+	{
+		JSONArray jarr = new JSONArray();
+		JSONParser jpar1 = new JSONParser();
+		try
+		{
+			jarr=(JSONArray)jpar.parse(bc.getLikeList());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		if(!jarr.contains(p.getID().toString()))
+		{
+		System.out.println("Entered the else 's if ");
+		jarr.add(p.getID().toString());
+		bc.setLikeList(jarr.toString());
+		System.out.println(jarr.toString());
+		bcs.update (bc);
+	}
+
+		 int length = jarr.size();
+         
+         System.out.println("String array length is: " + length);
+	
+		
+		rjson.put("status", "Updated");
+		rjson.put("length", length);
+		rjson.put("id", bc.getContentID());
+				System.out.println(rjson);
+				
+				
+		}
+	
+	return new ResponseEntity<String>(rjson.toString(), HttpStatus.CREATED);
+	
+	
+	
+	}
+	
+	
+
+	@CrossOrigin
+    @RequestMapping(value = "/submitComment/", method = RequestMethod.POST)
+    public ResponseEntity<String> submitComment(@ModelAttribute BlogComment p,HttpServletRequest request, HttpServletResponse response, @RequestBody String data12, UriComponentsBuilder ucBuilder) 
+	{
+		System.out.println(data12);
+		
+		JSONParser jpar = new JSONParser();
+        
+        JSONObject jobj = new JSONObject();
+        
+        
+        try
+        {
+        	jobj = (JSONObject)jpar.parse(data12);
+        }
+		catch(Exception e)
+        {
+			System.out.println("ERROR READING ADDRESSES");
+        }
+    	
+        
+        String CommentContent = jobj.get("CommentValue").toString();
+        String ContentID = jobj.get("CommentID").toString();
+        System.out.println(CommentContent);
+        System.out.println(ContentID);
+        String user = "";
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    	if (auth != null && !auth.getName().equals("anonymousUser"))
+	    	{    
+	    		user = auth.getName();
+	    	}
+	    	
+	    	DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+			Date dateobj = new Date();
+		
+		Profile pu = ps.getUser(user);
+		if(user!=null)
+		{
+
+			p.setContentID(ContentID);
+			p.setCommentValue(CommentContent);
+			p.setTimeStamp(df.format(dateobj));
+			p.setOwnerID(pu.getID().toString());
+			bcms.insert(p);
+		}
+		JSONObject res = new JSONObject();
+		
+		
+	    	res.put("Comment", p.getCommentValue());
+	    	res.put("CommentUserName",user);
+	    	res.put("status", "updated");
+	    	res.put("Contentid", p.getContentID());
+	    	System.out.println(res.toJSONString());
+	    
+	    	
+        return new ResponseEntity<String>(res.toJSONString(), HttpStatus.CREATED);
+    }
+	
+
+	@CrossOrigin
+	@RequestMapping(value = "/fetchcomment/", method = RequestMethod.POST)
+	public ResponseEntity<String> fetchcomment(HttpServletRequest request, HttpServletResponse response,UriComponentsBuilder ucBuilder) {
+
+		String user = null;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null && !auth.getName().equals("anonymousUser")) 
+		{
+			user = auth.getName();
+		}
+		List<Profile> list1 = ps.getAllUsers();
+		List<BlogComment> list = bcms.getAllBlogs();
+		JSONArray jarr = new JSONArray();
+		for(BlogComment b:list )
+		{
+			JSONObject jobj = new JSONObject();
+			for(Profile pk:list1)
+			{
+				if(pk.getID().toString().equals(b.getOwnerID()) )
+				{
+					jobj.put("OwnerName",pk.getUsername());
+					
+				}
+			}
+		
+		jobj.put("CommentValue",b.getCommentValue());
+		jobj.put("CommentTimeStamp",b.getTimeStamp());
+		jobj.put("Contentid",b.getContentID());
+		jarr.add(jobj);
+		}
+		System.out.println(jarr);
+		return new ResponseEntity<String>(jarr.toString(), HttpStatus.CREATED);
+	}
 }

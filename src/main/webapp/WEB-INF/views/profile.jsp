@@ -12,7 +12,7 @@
 <style type="text/css">
 
 body {
-	background: url(resources/images/wood.jpg) no-repeat center center fixed;
+	background: url(resources/images/bk6.jpg) no-repeat center center fixed;
 }
 
 </style>
@@ -535,6 +535,24 @@ body {
 			</tr>
 		</tbody>
 	 </table>
+	 
+</div>
+
+<div class="col-sm-6">
+<table style="width: 80%;" class="table">
+					
+					<tr>
+						<ul style="font-style: italic;font-weight: bold;font-size: 16px;font-family: Segoe UI, Tahoma, sans-serif; color: #333333; padding: 5px; opacity: 0.8; line-height: 20px;" class="list-group">
+							<a href="${pageContext.request.contextPath}/blog/" class="list-group-item profile-list-group-item"><li > Blogs</li></a>
+							<a href="${pageContext.request.contextPath}/forum/{{userdata.ProfileName}}" class="list-group-item profile-list-group-item"><li> Forums</li></a>
+							<a href="${pageContext.request.contextPath}/gallery/{{userdata.ProfileName}}" class="list-group-item profile-list-group-item"><li> Gallery</li></a>							
+						</ul>
+					</tr>
+									  	
+					<br>
+									  	
+				</table>
+</div>
 </div>
 </div>
 
@@ -589,19 +607,7 @@ body {
  <br><br><br>
  
  </table>
-	 <table style="width: 80%;" class="table">
-					
-					<tr>
-						<ul style="font-style: italic;font-weight: bold;font-size: 16px;font-family: Segoe UI, Tahoma, sans-serif; color: #333333; padding: 5px; opacity: 0.8; line-height: 20px;" class="list-group">
-							<a href="${pageContext.request.contextPath}/blog/" class="list-group-item profile-list-group-item"><li > Blogs</li></a>
-							<a href="${pageContext.request.contextPath}/forum/{{userdata.ProfileName}}" class="list-group-item profile-list-group-item"><li> Forums</li></a>
-							<a href="${pageContext.request.contextPath}/gallery/{{userdata.ProfileName}}" class="list-group-item profile-list-group-item"><li> Gallery</li></a>							
-						</ul>
-					</tr>
-									  	
-					<br>
-									  	
-				</table>
+	 
  
  
  </html>

@@ -21,11 +21,26 @@ li a:hover:not(.active) {
 </head>
 </html>
     <body>
-    <navbar class="navbar navbar-fixed-top">
+    <navbar class="navbar ">
   <div class="container-fluid">
     
     
-    <div class="collapse navbar-collapse" id="myNavbar">
+    <div class="navbar-header">
+      
+    
+    
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+     
+      
+      <input type="text" name="search" placeholder="Search..... " maxlength="15" size="70" style="padding:10px">
+      
+    </div>
+    
+    <div class="collapse navbar-collapse" >
        <ul class="nav navbar-nav navbar-right">
        <li class="dropdown">
       <li><a href="${pageContext.request.contextPath}/profile" class="btn ">Home</a></li>

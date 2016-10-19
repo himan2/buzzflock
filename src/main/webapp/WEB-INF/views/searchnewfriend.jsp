@@ -367,22 +367,43 @@ RemoveFriend: function(item)
 				<td>UserName :{{data.ProfileName}}<br>Email ID : {{data.ProfileEmail}}<br>{{data.ProfileID}}</td>
 			
 			
-				<td>
+			<td>
 	 			<button type="button"  class="btn btn-success" ng-show="data.ProfileAssociation =='notfriend'"  ng-click="AddFriend(data.ProfileID,data.ProfileName);">Add friend</button>
 				<button type="button"  class="btn btn-success"  ng-show="data.ProfileAssociation=='pendingrequest'" ng-click="AcceptRequest(data.ProfileID ,data.ProfileName)">Accept Request</button>
-				<button type="button"  class="btn btn-success"  ng-show="data.ProfileAssociation=='pendingrequest'" >Ignore</button>
-				<button type="button" class="btn btn-success" ng-model= "data.ProfileAssociation"  value="{{data.ProfileAssociation}}" ng-show="data.ProfileAssociation=='Sent'" ng-click="Delete(data.ProfileID,data.ProfileName);">Cancel Request</button>
-			 	<button type="button" class="btn btn-success" ng-show="data.ProfileAssociation=='Friend'" >Friends</button>
-			 	<td>
-			 		<label class="alert alert-success" ng-show="data.ProfileAssociation =='Sent'">Updated</label>
-				<label class="alert alert-success" ng-show="data.ProfileAssociation =='Friend'">Updated</label>
-					
-			</td>	      
-			 	<a href= "${ pageContext.request.contextPath}/viewprofile/{{data.ProfileName}}" type="button" class="btn btn-success pull-right">View Profile</a>
+				<button type="button"  class="btn btn-success"  ng-show="data.ProfileAssociation=='pendingrequest'" ng-click="IgnoreFriend(data.ProfileID ,data.ProfileName)" >Ignore</button>
+				<button type="button" class="btn btn-success" ng-model= "data.ProfileAssociation"  value="{{data.ProfileAssociation}}" ng-show="data.ProfileAssociation=='Sent'" ng-click="Delete(data.ProfileID,data.ProfileName);">Cancel Request(click to undo)</button>
+  				
+   				<button type="button" ng-show="data.ProfileAssociation=='Friend'" class="btn btn-success " ng-click="password=!password;" > 
+    			<span ng-if="!password" >FRIends</span>
+			 	<span  ng-if="password" >let it be</span>
+			 	</button>
+    			
+    			<button ng-show="data.ProfileAssociation=='Friend'|| " ng-if="password" class="btn btn-danger">
+    			<span  ng-click="RemoveFriend(data.ProfileID ,data.ProfileName)">Remove friend</span>
+			 	</button>
+    			</td>
+    			
+    					 	<td>
+				<label class="alert alert-success" ng-show=""data.ProfileAssociation=='Sent'&& update == 'Updated'">Updated</label>
+				<label class="alert alert-success" ng-show="update =='Deleted'">Request Cancelled</label>
 				
+			</td>	      
+	
+	
+	
+			 	
+		<!-- 
+						<!-- <button  ng-if="password" ng-click="RemoveFriend(data.ProfileID ,data.ProfileName)">Remove friend</button>
+			 	<button  ng-if="password" ng-click="password=!password;)">let it be</button></td>
+	
+		
+			 	<button type="button" class="btn btn-success" ng-show="data.ProfileAssociation=='Friend'" >Friends</button>
+			 	<a href= "${ pageContext.request.contextPath}/viewprofile/{{data.ProfileName}}" type="button" class="btn btn-success pull-right">View Profile</a>
+ -->				
 				</tr>
 			</tbody>
 		</table>
+	</div>
 	</div>
 
 </body>

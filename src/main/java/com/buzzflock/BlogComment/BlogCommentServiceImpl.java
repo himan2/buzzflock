@@ -1,4 +1,4 @@
-package com.buzzflock.Blog;
+package com.buzzflock.BlogComment;
 
 import java.util.List;
 
@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class BlogServiceImpl implements BlogService 
+public class BlogCommentServiceImpl implements BlogCommentService
 {
 	@Autowired
-	BlogDAO dao;
+	BlogCommentDAO dao;
 	
 	@Transactional
-	public void insert(Blog p) 
+	public void insert(BlogComment p) 
 	{
 		dao.insert(p);
 	}
@@ -22,25 +22,22 @@ public class BlogServiceImpl implements BlogService
 	{
 		dao.delete(p);
 	}
+	
 	@Transactional
-	public void update(Blog p) 
+	public void update(BlogComment p) 
 	{
 		dao.update(p);
 	}
 	
 	@Transactional
-	public Blog get(String p) 
-	{
+	public BlogComment get(String p) {
 		return dao.get(p);
 	}
+	
 	@Transactional
-	public List<Blog> getAllBlogs() 
+	public List<BlogComment> getAllBlogs() 
 	{
 		return dao.getAllBlogs();
 	}
-	@Transactional
-	public Blog getBlogWithMaxId()
-	{
-		return dao.getBlogWithMaxId();
-	}
+
 }

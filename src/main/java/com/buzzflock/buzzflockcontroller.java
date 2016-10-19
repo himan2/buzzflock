@@ -15,6 +15,7 @@ import javax.validation.Valid;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -31,6 +32,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.buzzflock.Blog.Blog;
 import com.buzzflock.Blog.BlogService;
+import com.buzzflock.BlogComment.BlogComment;
+import com.buzzflock.BlogComment.BlogCommentDAO;
+import com.buzzflock.BlogContent.BlogContent;
+import com.buzzflock.BlogContent.BlogContentService;
 import com.buzzflock.ProfileModel.Profile;
 import com.buzzflock.ProfileModel.ProfileService;
 import com.buzzflock.ProfileRole.ProfileRoleService;
@@ -53,6 +58,12 @@ public class buzzflockcontroller {
 	@Autowired
 	ServletContext context;
 
+
+	@Autowired 
+	BlogContentService bcs;
+	
+	@Autowired
+	BlogCommentDAO bcms;
 	
 	@RequestMapping(value="/")	
 	public String home()
@@ -71,6 +82,220 @@ public class buzzflockcontroller {
 	{
 		return "searchnewfriend";
 	}
+	
+//////////////////////////////////////////////////////For Adding content in blog
+	
+	@RequestMapping(value="/blogcontent/{BlogID}")
+	public ModelAndView blogcontent(@PathVariable("BlogID") String id)
+	{
+		System.out.println("this is id "+id);
+		
+		ModelAndView mav = new ModelAndView("blogcontent");
+		String user ="";
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if(authentication!=null && !authentication.equals("annonymousUser"))
+		{
+			user = authentication.getName();
+		}
+		
+			
+		List<Profile> list1 = us.getAllUsers();
+		try{
+		List<BlogComment> list2 = bcms.getAllBlogs();
+		List<BlogContent> list = bcs.getAllBlogs();
+		
+		Blog b = bs.get(id);
+		
+		for(Profile p:list1)
+		{
+		/*	System.out.println("p.getUsername()" + p.getUsername());
+			System.out.println("p.getUsername()" + p.getID());
+			System.out.println("p.getUsername()" + b.getOwnerID());
+		*/	if (String.valueOf(p.getID()).equals(b.getOwnerID()))
+			{
+				System.out.println("matched owner id");
+				mav.addObject("Username",p.getUsername());
+				break;
+			}
+			
+		}
+		Profile pu = us.getUser(user);
+		System.out.println("this is list is "+list);
+		
+		mav.addObject("BlogId",b.getBlogID());
+		mav.addObject("Topicname",b.getTopicname());
+		mav.addObject("Description",b.getDescription());
+		
+		
+		JSONArray jarr = new JSONArray();
+
+		
+		
+		if(b.getBlogID().toString()!=null&& list!=null)
+		{
+			System.out.println("33333");
+			for(BlogContent b2:list)
+				{
+				
+				
+				JSONObject jobj = new JSONObject();
+					System.out.println("555555555555");
+					System.out.println("b2.getBlogID is " +b2.getBlogID()+"  value :  "+b2.getValue());
+					System.out.println("b.getBlogID().toString() is " +b.getBlogID().toString());
+					
+					
+					
+					for(BlogComment b3:list2)
+					{
+						if(!String.valueOf(b2.getContentID()).equals(null) && !String.valueOf(b2.getContentID()).equals(null) )
+						{
+							
+							System.out.println("comment matched");
+							System.out.println("comment matched");
+							
+							if(String.valueOf(b2.getContentID()).equals(b3.getContentID()) )
+							{
+								System.out.println("comment matched");
+								jobj.put("CommentValue", b3.getCommentValue());
+								
+							}
+						}
+					}
+					
+					
+						
+						
+						
+						
+					if(b2.getBlogID().equals(b.getBlogID().toString()))
+							{
+								System.out.println("666666666");
+								JSONArray jarr1 = new JSONArray();
+								JSONParser jpar= new JSONParser();
+								
+								if(b2.getLikeList()!=null)
+								{
+									try
+									{
+										jarr1=(JSONArray)jpar.parse(b2.getLikeList());
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
+								
+								
+									if(b2.getLikeList().contains(pu.getID().toString()))
+									{
+										
+										jobj.put("check1", "true");		
+										
+									}
+									else
+									{
+										jobj.put("check1", "true");		
+										
+									}
+								
+								
+								}
+								else
+								{
+									jobj.put("check1", "false");		
+									
+								}
+									
+								jobj.put("Value", b2.getValue());
+								jobj.put("blogid", b2.getContentID());
+								jobj.put("Timestamp",b2.getTimeStamp());
+								 int length = jarr1.size();
+								jobj.put("length12",length);
+								jobj.put("likedlist",b2.getLikeList());		
+								jobj.put("Contentid",b2.getContentID());
+								//jobj.put("ownerid", pu.getUsername());
+								
+								jarr.add(jobj);
+							}	
+					
+				
+				}
+			
+		}
+		
+		
+		
+		else if (b.getBlogID().toString()==null&& list==null)
+			{
+			JSONObject jobj = new JSONObject();
+				jobj.put("Value", "no post");
+				
+				jarr.add(jobj);
+			}
+	
+		
+		mav.addObject("mydata", jarr.toJSONString());
+		System.out.println("ARRAY"+jarr.toString());
+		mav.addObject("blogcontent", new BlogContent());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			
+		}
+		
+		return mav;
+	}
+
+@RequestMapping(value = "/addcontent", method = RequestMethod.POST)
+public String addcontent(@ModelAttribute("blog") BlogContent p) 
+{
+	
+	System.out.println("this is the id "+ p.getBlogID());
+	
+	
+	
+	
+	String user = "";
+	
+	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	if (auth != null && !auth.getName().equals("anonymousUser")) 
+	{
+		user = auth.getName();
+	}
+		Profile p1 = us.getUser(user);
+		
+		DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+		Date dateobj = new Date();
+		
+		System.out.println(df.format(dateobj));
+	try{	
+		
+		p.setBlogID(p.getBlogID());
+		p.setTimeStamp(df.format(dateobj).toString());
+		p.setValue(p.getValue());
+	
+		System.out.println(p.getBlogID());
+		System.out.println(p.getTimeStamp().toString());
+		System.out.println(p.getValue());
+		
+		bcs.insert(p);
+	}
+	
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}
+		return "redirect:http://localhost:9001/buzzflock/blog/";
+	}
+
+
+@RequestMapping(value = "/like", method = RequestMethod.POST)
+public String like() 
+{
+
+
+return "redirect:blog";
+}
 	
 	
 	@RequestMapping(value = "/viewprofile/{profileName}")
@@ -118,6 +343,7 @@ public class buzzflockcontroller {
 			jobj.put("Description",b.getDescription());
 			jobj.put("Dateandtime",b.getTimestamp());
 			jobj.put("OwnerID",b.getOwnerID());
+			jobj.put("BlogID",b.getBlogID());
 			
 			jarr.add(jobj);
 		}
@@ -150,6 +376,135 @@ public class buzzflockcontroller {
 		mav.addObject("blog" , new Blog());
 		return mav;
 	}
+	
+	@RequestMapping(value = "/updateblog/{BlogID}")
+	public ModelAndView update(@PathVariable("BlogID") String prodid) 
+	{
+		ModelAndView mav = new ModelAndView("updateblog");
+		System.out.println(prodid);
+		Blog b= bs.get(prodid.toString());
+		System.out.println(b.getTopicname());
+		
+		mav.addObject("blog", b);
+		
+		return mav;
+
+	}
+	
+
+	@RequestMapping(value = "/updateblog", method = RequestMethod.POST)
+	public String updateproduct(@ModelAttribute("blog") Blog p) 
+	{
+		System.out.println("this is the id "+ p.getBlogID());
+		/*
+		Blog b = bs.get(p.toString());
+		
+		System.out.println(b.getBlogID());
+*/		
+
+	String user = "";
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null && !auth.getName().equals("anonymousUser")) 
+		{
+			user = auth.getName();
+		}
+			Profile p1 = us.getUser(user);
+				/*
+			DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+			Date dateobj = new Date();
+			System.out.println(df.format(dateobj));
+			p.setOwnerID(p1.getID().toString());
+			p.setTimestamp(df.format(dateobj));
+			bs.insert(p);
+			
+			JSONObject jobj= new JSONObject();
+			JSONParser jpar= new JSONParser();
+			try
+			{
+				jobj = (JSONObject) jpar.parse(p.toString());
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		
+			String id = jobj.get("Topicname").toString();
+			System.out.println(id);
+			
+				
+*/
+
+
+			try {
+				
+				String path = context.getRealPath("/");
+
+				System.out.println(path);
+				
+				File directory = null;
+
+				// System.out.println(ps.getProductWithMaxId());
+
+				if (p.getProductFile().getContentType().contains("image"))
+					
+				{
+					directory = new File(path + "\\resources\\images");
+
+					System.out.println(directory);
+					byte[] bytes = null;
+					File file = null;
+					bytes = p.getProductFile().getBytes();
+
+					if (!directory.exists())
+						directory.mkdirs();
+
+					file = new File(directory.getAbsolutePath() + System.getProperty("file.separator") + "image_" + p.getBlogID() + ".jpg");
+
+					System.out.println(file.getAbsolutePath());
+
+					BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
+					stream.write(bytes);
+					stream.close();
+
+				}
+
+				p.setImage("resources/images/image_" + p.getBlogID() + ".jpg");
+				//p.setID(p1.getID());
+				p.setOwnerID(p1.getID().toString());
+				
+				//p.setProductFile(p.getProductFile());
+				//b.setOwnerID(p1.getID().toString());
+				//p.setTimestamp(b.getTimestamp().toString());
+				System.out.println(p.getID());
+				System.out.println(p.getBlogID());
+				
+				bs.update(p);
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}
+
+			return "redirect:blog";
+		}
+	
+
+
+	///////////////////////////DElete blog
+	@RequestMapping(value = "/delete/{BlogID}")
+	public String deleteproduct1(@PathVariable("BlogID") int prodid) 
+	{
+
+		System.out.println(prodid);
+
+		bs.delete(prodid);
+		
+		return "redirect:http://localhost:9001/buzzflock/blog";
+		
+		
+	}
+	
 	
 	@RequestMapping(value = "/insertblog", method = RequestMethod.POST)
 	public String insertproduct(@ModelAttribute("blog") Blog p) 

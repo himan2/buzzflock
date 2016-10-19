@@ -13,10 +13,9 @@
   <script src="resources/references/js/bootstrap.min.js"></script>
 <style>
 body {
-	background: url(resources/images/img1.jpg) no-repeat center center fixed;
+	background: url(${pageContext.request.contextPath}/resources/images/img1.jpg) no-repeat center center fixed;
 }
 .jumbotron{
-
 width: 100%;
     padding: 12px 10px;
     margin: 0;
