@@ -13,13 +13,13 @@
 <style>
 
 body {
-   background: url(resources/images/Dark-wooden-website-background.jpg) no-repeat center center fixed; 
+   background: url(resources/images/img9.jpg) no-repeat center center fixed; 
 }
- #wrap{
+/*  #wrap{
 
 background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FFFFFF), color-stop(1, #D3D8E8));
 /* Webkit (Chrome 11+) */ 
-background-image: linear-gradient(to bottom, #FFFFFF 0%, 	#8B4513 100%);
+background-image: linear-gradient(to bottom, #FFFFFF 0%, 	#8B4513 100%); */
 }  
 legend{
  color:black;
@@ -65,9 +65,9 @@ legend{
 <body>
 
 <br>
-<br><br><br><br><br><br>
-
-<div class="container" id="wrap">
+<br><br><br>
+<div class="container" id="wrap" style="background-color: rgba(255, 255, 255, 0.7);">
+		<br>
 		
 		<!--  -->
 		<c:if test="${not empty passwordmismatch}">
@@ -93,6 +93,8 @@ legend{
         <div class="col-md-6 col-md-offset-3">
             <form:form action="${pageContext.request.contextPath}/insertuser" method="post" modelAttribute="newuser" accept-charset="utf-8" class="form">   
             <legend>Sign Up</legend>
+           
+            
                     <h4>It's free and always will be.</h4>
                     
                     <div class="row">

@@ -42,6 +42,8 @@ import com.buzzflock.BlogComment.BlogComment;
 import com.buzzflock.BlogComment.BlogCommentService;
 import com.buzzflock.BlogContent.BlogContent;
 import com.buzzflock.BlogContent.BlogContentService;
+import com.buzzflock.Forum.Forum;
+import com.buzzflock.Forum.ForumService;
 import com.buzzflock.ProfileModel.Profile;
 import com.buzzflock.ProfileModel.ProfileService;
 
@@ -51,6 +53,9 @@ import com.buzzflock.ProfileModel.ProfileService;
 
 public class RESTbuzzflockController {
 
+	@Autowired
+	ForumService fs;
+	
 	@Autowired
 	ProfileService ps;
 	
@@ -62,6 +67,7 @@ public class RESTbuzzflockController {
 	
 	@Autowired
 	BlogCommentService bcms;
+	
 	
 
 	@CrossOrigin
@@ -984,6 +990,7 @@ public ResponseEntity<String> AcceptRequest(HttpServletRequest req, HttpServletR
 		return new ResponseEntity<String>(json.toString(), HttpStatus.CREATED);
 	}
 
+
 	
 	@CrossOrigin
 	@RequestMapping(value = "/updateLike/", method = RequestMethod.POST)
@@ -1167,4 +1174,6 @@ public ResponseEntity<String> AcceptRequest(HttpServletRequest req, HttpServletR
 		System.out.println(jarr);
 		return new ResponseEntity<String>(jarr.toString(), HttpStatus.CREATED);
 	}
+	
+	
 }

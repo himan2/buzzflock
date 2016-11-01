@@ -23,7 +23,7 @@ body {
 		
 	    return {
 	    	
-	    	fetchAllItems: function() 
+			fetchAllItems: function() 
 			{
 									return $http
 											.post('http://localhost:9001/buzzflock/fetchAllItems/')
@@ -61,7 +61,7 @@ body {
 		,
 	    IgnoreFriend: function(item)
 	    {
-            					return $http.post('http://localhost:9001/buzzflock/IgnoreFriend/', item)
+            return $http.post('http://localhost:9001/buzzflock/IgnoreFriend/',item)
                     						.then
                     						(
                             					function(response)
@@ -279,6 +279,9 @@ RemoveFriend: function(item)
 	             								}
 	             							);
 	             		};
+	             		
+	            $scope.ProfileID = 0;
+	             		
 	             $scope.Delete = function(ProfileID, ProfileName )
 	             {
 	             	$scope.cfrequest = {"ProfileID" : ProfileID ,"FriendID": ProfileName};
@@ -296,6 +299,7 @@ RemoveFriend: function(item)
 	                  							if( $scope.data[i].ProfileID == response.ProfileID )
 	                  							{
 	                  								$scope.data[i].ProfileAssociation = response.ProfileAssociation;
+	                  								$scope.ProfileID = response.ProfileID;
 	                  								break;
 	                  							}
 	                  							
@@ -304,6 +308,7 @@ RemoveFriend: function(item)
 	              							window.setTimeout(function()
 	             		                 				{
 	             		                 					$scope.$apply( $scope.update = '' );
+	             		                 					$scope.$apply( $scope.ProfileID = 0 );
 	             		                 				},3000);
 	             		         				
 	                  		
@@ -385,7 +390,7 @@ RemoveFriend: function(item)
     			
     					 	<td>
 				<label class="alert alert-success" ng-show=""data.ProfileAssociation=='Sent'&& update == 'Updated'">Updated</label>
-				<label class="alert alert-success" ng-show="update =='Deleted'">Request Cancelled</label>
+				<label class="alert alert-success" ng-show="update =='Deleted' && ProfileID == data.ProfileID ">Request Cancelled</label>
 				
 			</td>	      
 	

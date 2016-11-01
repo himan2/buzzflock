@@ -11,15 +11,15 @@
  <c:import url="head-meta.jsp" />
 <style>
 body {
-   background: url(resources/images/Dark-wooden-website-background.jpg) no-repeat center center fixed; 
+   background: url(resources/images/img8.jpg) no-repeat center center fixed; 
 }
- #wrap{
+/*  #wrap{
 background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FFFFFF), color-stop(1, #D3D8E8));
 /* Webkit (Chrome 11+) */ 
-background-image: linear-gradient(to bottom, #FFFFFF 0%, 	#8B4513 100%);
+background-image: linear-gradient(to bottom, #FFFFFF 0%, 	#8B4513 100%); */
 }  
 legend{
- color:black;
+ color:white;
  font-size:25px;
  font-weight:bold;
  text-align: center;
@@ -59,8 +59,8 @@ legend{
 
 <br><br><br><br><br><br>
 
-<div class="container" id="wrap">
-		
+<div class="container" id="wrap" style="background-color: rgba(255, 255, 255, 0.7);">
+		<br><br><br>
 		 <div class="row">
         <div class="col-md-6 col-md-offset-3">
             
@@ -100,7 +100,8 @@ legend{
                         <br><br>
             </form>          
           </div>
-</div>            
+</div>  
+<br><br><br>          
 </div>
 
 </body>

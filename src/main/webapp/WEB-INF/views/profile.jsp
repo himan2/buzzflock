@@ -452,6 +452,41 @@ body {
 
 <body ng-app="myApp" ng-controller="abc">
 <c:import url="head.jsp"/>
+<div class="container">
+<div class="row">
+<div class="col-sm-4">
+<div class="panel ">
+      
+      <div class="btn-group btn-group-justified">
+    <a href="${pageContext.request.contextPath}/blog/"  class="btn btn-primary">
+    <img src="resources/images/blog1.jpg" alt="" width="300" height="150" border="0"></a>
+  </div>
+
+      </div>
+    </div>
+    
+    <div class="col-sm-4">
+<div class="panel ">
+            <div class="btn-group btn-group-justified">
+    <a href="${pageContext.request.contextPath}/forum"  class="btn btn-primary">
+    <img src="resources/images/forum.jpg" alt="" width="300" height="150" border="0"></a>
+</div>
+           </div>
+    </div>
+    
+    <div class="col-sm-4">
+<div class="panel ">
+
+      <div class="btn-group btn-group-justified">
+    <a href="${pageContext.request.contextPath}/gallery"  class="btn btn-primary">
+    <img src="resources/images/gallery.jpg" alt="" width="300" height="150" border="0">
+    </a>
+</div>
+      </div>
+    </div>
+</div>
+</div>
+
 
 	<div>
 <a href= "${ pageContext.request.contextPath}/searchnewfriend" type="button" class="btn btn-success pull-right">All Profile</a>
@@ -460,7 +495,7 @@ body {
 
 <div class="container">
 <div class="row">
-<div class="col-sm-6">
+<div class="col-sm-12">
 
 <table class="table " style="background-color: rgba(255,255,255,0.8);">
 
@@ -538,26 +573,12 @@ body {
 	 
 </div>
 
-<div class="col-sm-6">
-<table style="width: 80%;" class="table">
-					
-					<tr>
-						<ul style="font-style: italic;font-weight: bold;font-size: 16px;font-family: Segoe UI, Tahoma, sans-serif; color: #333333; padding: 5px; opacity: 0.8; line-height: 20px;" class="list-group">
-							<a href="${pageContext.request.contextPath}/blog/" class="list-group-item profile-list-group-item"><li > Blogs</li></a>
-							<a href="${pageContext.request.contextPath}/forum/{{userdata.ProfileName}}" class="list-group-item profile-list-group-item"><li> Forums</li></a>
-							<a href="${pageContext.request.contextPath}/gallery/{{userdata.ProfileName}}" class="list-group-item profile-list-group-item"><li> Gallery</li></a>							
-						</ul>
-					</tr>
-									  	
-					<br>
-									  	
-				</table>
-</div>
+
 </div>
 </div>
 
 	 
-<div class="col-sm-6">
+<div class="col-sm-12">
 <table class=table style="background-color: rgba(255,255,255,0.8);">
 <tbody ng-if="password">
 
@@ -608,6 +629,6 @@ body {
  
  </table>
 	 
- 
- 
+
+ </body>
  </html>

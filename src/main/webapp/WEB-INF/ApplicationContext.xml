@@ -58,6 +58,7 @@ xmlns="http://www.springframework.org/schema/beans"
 		<value>com.buzzflock.Blog</value>
 		<value>com.buzzflock.BlogContent</value>
 		<value>com.buzzflock.BlogComment</value>
+		<value>com.buzzflock.Forum</value>
 		</list>
 		</property>
 		

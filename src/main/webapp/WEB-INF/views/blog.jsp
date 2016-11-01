@@ -9,10 +9,10 @@
 <c:import url="head-meta.jsp"></c:import>
 <style type="text/css">
 body {
-	background: url(${pageContext.request.contextPath}/resources/images/bk7.jpg) no-repeat center center fixed;
+	background: url(${pageContext.request.contextPath}/resources/images/img10.jpg) no-repeat center center fixed;
 }
 .container{
-background-color: rgba(255,0,0, 0.5);
+background-color: rgba(255,255,255, 0.5);
 }
 </style>
 </head>
@@ -42,9 +42,9 @@ background-color: rgba(255,0,0, 0.5);
 
 <div class="container" >
 	<br><br><div>
-		<a href="${pageContext.request.contextPath}/addblog/" type="button" class="btn-center btn-success btn pull-right" align="right">Add Blog</a>
+		<a href="${pageContext.request.contextPath}/addblog/" type="button" class="btn-center btn-success btn pull-right" align="right" >Add Blog</a>
 	</div>	<br><br><br>
-<table class="table "  style="background-color: rgba(255,255,255,0.8);" >
+<table class="table "  style="background-color: rgba(255,255,255,1.0);" >
 			<thead>
 				<tr>
 					<th>Image</th>
